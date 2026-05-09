@@ -1,209 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Vantage Finance & Tech</title>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: Arial, sans-serif;
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #2D5BE3;
+    --blue-dark: #1A3A8F;
+    --cyan: #00AEEF;
+    --white: #ffffff;
+    --gray-light: #f4f7ff;
+    --gray-mid: #e8effe;
+    --text-dark: #1A2C5B;
+    --text-mid: #3A5299;
+    --text-gray: #555;
+    --radius: 12px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text-dark); background: var(--white); line-height: 1.7; }
 
-    body {
-        background: #f4f6f9;
-        color: #1f2937;
-        line-height: 1.6;
-    }
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid #e0e8ff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.5rem; height: 72px;
+    box-shadow: 0 2px 16px rgba(45,91,227,0.07);
+  }
+  .nav-logo img { height: 44px; display: block; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--text-mid); font-size: 0.93rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--blue); }
+  .nav-cta { background: var(--blue); color: var(--white); padding: 0.5rem 1.3rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--blue-dark); }
 
-    header {
-        background: linear-gradient(135deg, #1d4ed8, #2563eb);
-        color: white;
-        text-align: center;
-        padding: 60px 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 60%, var(--cyan) 100%);
+    color: var(--white); padding: 6rem 2.5rem 5rem; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before { content: ''; position: absolute; top: -80px; right: -80px; width: 340px; height: 340px; background: rgba(0,174,239,0.18); border-radius: 50%; }
+  .hero::after { content: ''; position: absolute; bottom: -60px; left: -60px; width: 240px; height: 240px; background: rgba(0,174,239,0.12); border-radius: 50%; }
+  .hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+  .hero-logo { margin-bottom: 2.5rem; }
+  .hero-logo img { height: 70px; display: inline-block; filter: brightness(0) invert(1); }
+  .hero h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 700; line-height: 1.3; margin-bottom: 1.5rem; }
+  .hero p { font-size: 1.1rem; opacity: 0.9; max-width: 580px; margin: 0 auto 2rem; }
+  .hero-badges { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; }
+  .badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); color: var(--white); padding: 0.35rem 1rem; border-radius: 100px; font-size: 0.82rem; font-weight: 500; }
+  .hero-cta { display: inline-block; margin-top: 2.5rem; background: var(--white); color: var(--blue); padding: 0.85rem 2.2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(0,0,0,0.18); }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.22); }
 
-    header img {
-        max-width: 300px;
-        width: 100%;
-        height: auto;
-        margin-bottom: 25px;
-        border-radius: 8px;
-    }
+  /* SECTIONS */
+  section { padding: 5rem 2.5rem; }
+  .section-inner { max-width: 960px; margin: 0 auto; }
+  .section-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cyan); margin-bottom: 0.6rem; }
+  .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: var(--text-dark); margin-bottom: 1rem; }
+  .section-sub { font-size: 1rem; color: var(--text-gray); max-width: 680px; margin-bottom: 3rem; line-height: 1.75; }
 
-    header h1 {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        font-weight: 900;
-    }
+  /* ABOUT */
+  .about { background: var(--gray-light); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+  .about-text p { color: var(--text-gray); font-size: 1rem; line-height: 1.8; }
+  .about-text p + p { margin-top: 1rem; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .stat-card { background: var(--white); border: 1px solid var(--gray-mid); border-radius: var(--radius); padding: 1.4rem 1.25rem; text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 800; color: var(--blue); line-height: 1; }
+  .stat-label { font-size: 0.8rem; color: var(--text-gray); margin-top: 0.4rem; }
 
-    header p {
-        max-width: 850px;
-        margin: auto;
-        font-size: 1.2rem;
-    }
+  /* SERVICES */
+  .services { background: var(--white); }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .service-card { background: var(--gray-light); border: 1px solid var(--gray-mid); border-radius: var(--radius); padding: 2rem 1.75rem; position: relative; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+  .service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(45,91,227,0.12); }
+  .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+  .service-icon { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(135deg, var(--blue), var(--cyan)); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; }
+  .service-icon svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .service-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.75rem; }
+  .service-card p { font-size: 0.9rem; color: var(--text-gray); line-height: 1.7; }
 
-    section {
-        padding: 60px 10%;
-    }
+  /* SPECIALITIES */
+  .specialities { background: var(--blue-dark); color: var(--white); }
+  .specialities .section-title { color: var(--white); }
+  .spec-pills { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+  .spec-pill { background: rgba(255,255,255,0.1); border: 1.5px solid rgba(0,174,239,0.5); color: var(--white); padding: 0.6rem 1.4rem; border-radius: 100px; font-size: 0.95rem; font-weight: 600; }
 
-    .card {
-        background: white;
-        padding: 30px;
-        border-radius: 14px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-        margin-bottom: 30px;
-    }
+  /* CONTACT */
+  .contact { background: var(--gray-light); }
+  .contact-box { background: var(--white); border: 1px solid var(--gray-mid); border-radius: var(--radius); padding: 3rem 2.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .contact-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 1.5rem; }
+  .contact-row { display: flex; align-items: flex-start; gap: 0.9rem; margin-bottom: 1.25rem; }
+  .contact-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--gray-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-icon svg { width: 20px; height: 20px; fill: none; stroke: var(--blue); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .contact-text { font-size: 0.9rem; color: var(--text-gray); line-height: 1.6; }
+  .contact-text strong { color: var(--text-dark); display: block; font-size: 0.82rem; margin-bottom: 0.15rem; }
+  .contact-text a { color: var(--blue); text-decoration: none; }
+  .contact-text a:hover { text-decoration: underline; }
+  .industry-box { background: var(--gray-light); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+  .industry-box h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+  .industry-tag { display: inline-block; background: rgba(45,91,227,0.1); color: var(--blue); border-radius: 6px; padding: 0.45rem 1rem; font-size: 0.88rem; font-weight: 600; }
 
-    h2 {
-        color: #1d4ed8;
-        margin-bottom: 20px;
-        font-size: 2rem;
-    }
+  /* FOOTER */
+  footer { background: var(--blue-dark); color: rgba(255,255,255,0.75); text-align: center; padding: 2rem 1.5rem; font-size: 0.85rem; }
+  footer strong { color: var(--white); }
 
-    ul {
-        padding-left: 20px;
-    }
-
-    li {
-        margin-bottom: 18px;
-    }
-
-    .services-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-    }
-
-    .service-box {
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 12px;
-        border-left: 6px solid #2563eb;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    }
-
-    .service-box h3 {
-        margin-bottom: 10px;
-        color: #1e3a8a;
-        font-size: 1.3rem;
-    }
-
-    .service-box p {
-        color: #4b5563;
-        line-height: 1.7;
-    }
-
-    footer {
-        background: #111827;
-        color: white;
-        text-align: center;
-        padding: 35px 20px;
-    }
-
-    footer p {
-        margin-bottom: 8px;
-    }
-
-    a {
-        color: #93c5fd;
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    @media (max-width: 768px) {
-        header h1 {
-            font-size: 2rem;
-        }
-
-        header img {
-            max-width: 200px;
-        }
-
-        section {
-            padding: 40px 6%;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-        }
-    }
+  @media (max-width: 680px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .about-grid, .contact-box { grid-template-columns: 1fr; }
+    section { padding: 3.5rem 1.25rem; }
+    .hero { padding: 4rem 1.25rem 3.5rem; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-    <img src="logo.svg" alt="Vantage Finance & Tech Logo">
-    <h1>Vantage Finance & Tech</h1>
-    <p>
-        Our firm provides elite managerial consultancy services designed to modernize your back-office operations.
-    </p>
-</header>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="logo.png" alt="Vantage Finance & Tech" />
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#specialities">Specialities</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in Touch</a>
+</nav>
 
-<section>
-    <div class="card">
-        <h2>About Us</h2>
-        <p>
-            At the intersection of financial precision and agile delivery, our firm provides elite managerial consultancy services designed to modernize your back-office operations.
-            With over 8 years of proven expertise, we bridge the gap between complex legacy processes and high-performing, cloud-integrated financial ecosystems.
-            We specialize in enterprise resource planning (ERP) and project management solutions that ensure seamless data flow and successful project delivery.
-        </p>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-logo">
+      <img src="logo.png" alt="Vantage Finance & Tech" />
     </div>
+    <h1>Elite Managerial Consultancy for the Modern Enterprise</h1>
+    <p>Our firm provides elite managerial consultancy services designed to modernize your back-office operations.</p>
+    <div class="hero-badges">
+      <span class="badge">Oracle ERP Cloud</span>
+      <span class="badge">SAP FI</span>
+      <span class="badge">PMO & Project Management</span>
+      <span class="badge">8+ Years Experience</span>
+    </div>
+    <a href="#services" class="hero-cta">Explore Our Services</a>
+  </div>
+</section>
 
-    <h2>Our Services</h2>
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-text">
+        <p class="section-label">Who We Are</p>
+        <h2 class="section-title">Precision Finance. Agile Delivery.</h2>
+        <p>At the intersection of financial precision and agile delivery, our firm provides elite managerial consultancy services designed to modernize your back-office operations. With over 8 years of proven expertise, we bridge the gap between complex legacy processes and high-performing, cloud-integrated financial ecosystems.</p>
+        <p style="margin-top:1rem;">We specialize in the heavy hitters of enterprise resource planning (ERP) and project management, ensuring your data flows seamlessly and your projects finish on time.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num">8+</div><div class="stat-label">Years of Expertise</div></div>
+        <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">Core Specialities</div></div>
+        <div class="stat-card"><div class="stat-num">ERP</div><div class="stat-label">Oracle & SAP Focus</div></div>
+        <div class="stat-card"><div class="stat-num">PMO</div><div class="stat-label">Strategic Oversight</div></div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="section-inner">
+    <p class="section-label">What We Do</p>
+    <h2 class="section-title">Our Core Services</h2>
+    <p class="section-sub">We specialize in enterprise resource planning and project management, delivering cloud-integrated solutions that drive real business value.</p>
     <div class="services-grid">
-
-        <div class="service-box">
-            <h3>Oracle Cloud ERP Finance</h3>
-            <p>
-                Deep-dive architectural support and implementation services ensuring your cloud transition becomes a strategic optimization, not just a migration.
-            </p>
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2,17 12,22 22,17"/><polyline points="2,12 12,17 22,12"/></svg>
         </div>
-
-        <div class="service-box">
-            <h3>SAP FI (Financial Accounting)</h3>
-            <p>
-                Expertise in streamlining General Ledger, Accounts Payable, and Accounts Receivable processes within SAP environments for strong reporting and compliance.
-            </p>
+        <h3>Oracle Cloud ERP Finance</h3>
+        <p>Deep-dive architectural support and implementation, ensuring your cloud transition is more than just a migration — it's an optimization.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         </div>
-
-        <div class="service-box">
-            <h3>PMO & Project Management Support</h3>
-            <p>
-                Strategic oversight that transforms your PMO into a value-driven engine focused on delivery excellence, governance, and operational efficiency.
-            </p>
+        <h3>SAP FI (Financial Accounting)</h3>
+        <p>Expertise in streamlining General Ledger, Accounts Payable, and Accounts Receivable within the SAP environment to ensure robust reporting and compliance.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-
+        <h3>PMO & Project Management Support</h3>
+        <p>Strategic oversight that transforms the Project Management Office from a reporting hub into a value-driven engine.</p>
+      </div>
     </div>
+  </div>
 </section>
 
-<section>
-    <div class="card">
-        <h2>Company Information</h2>
-        <p><strong>Industry:</strong> IT Services and IT Consulting</p>
-        <p><strong>Specialities:</strong> Oracle ERP Cloud, SAP FI, and PMO</p>
+<!-- SPECIALITIES -->
+<section class="specialities" id="specialities">
+  <div class="section-inner">
+    <p class="section-label" style="color:var(--cyan);">Our Focus Areas</p>
+    <h2 class="section-title">Industry & Specialities</h2>
+    <p style="color:rgba(255,255,255,0.8); max-width:600px; margin-bottom:1rem;">We operate at the forefront of IT Services and IT Consulting, with deep expertise in the following domains:</p>
+    <div class="spec-pills">
+      <span class="spec-pill">Oracle ERP Cloud</span>
+      <span class="spec-pill">SAP FI</span>
+      <span class="spec-pill">PMO</span>
+      <span class="spec-pill">IT Services & IT Consulting</span>
+      <span class="spec-pill">Back-Office Modernization</span>
+      <span class="spec-pill">Cloud Integration</span>
     </div>
-
-    <div class="card">
-        <h2>Contact Us</h2>
-        <p><strong>Phone:</strong> +39 3279304297</p>
-        <p><strong>Email:</strong> <a href="mailto:stefan.dumitriu30@gmail.com">stefan.dumitriu30@gmail.com</a></p>
-    </div>
+  </div>
 </section>
 
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <p class="section-label">Reach Out</p>
+    <h2 class="section-title">Get in Touch</h2>
+    <p class="section-sub">Ready to modernize your back-office operations? We'd love to hear from you.</p>
+    <div class="contact-box">
+      <div class="contact-info">
+        <h3>Contact Details</h3>
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.81a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16.92z"/></svg>
+          </div>
+          <div class="contact-text">
+            <strong>Phone</strong>
+            <a href="tel:+393279304297">+39 327 930 4297</a>
+          </div>
+        </div>
+        <div class="contact-row">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="contact-text">
+            <strong>Email</strong>
+            <a href="mailto:stefan.dumitriu30@gmail.com">stefan.dumitriu30@gmail.com</a>
+          </div>
+        </div>
+      </div>
+      <div class="industry-box">
+        <h3>Industry</h3>
+        <span class="industry-tag">IT Services and IT Consulting</span>
+        <h3 style="margin-top:0.5rem;">Specialities</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <span class="industry-tag">Oracle ERP Cloud</span>
+          <span class="industry-tag">SAP FI</span>
+          <span class="industry-tag">PMO</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-    <p>© 2026 Vantage Finance & Tech. All rights reserved.</p>
-    <p>VAT number 13449530016</p>
+  <p><strong>Vantage Finance & Tech</strong> &nbsp;·&nbsp; Precision Finance. Agile Delivery. Integrated Solutions.</p>
+  <p style="margin-top:0.5rem;">© 2026 Vantage Finance & Tech · VAT 13449530016</p>
 </footer>
 
 </body>
