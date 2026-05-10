@@ -49,22 +49,28 @@
     box-shadow: 0 2px 16px rgba(45,91,227,0.07);
   }
   .nav-logo img { height: 52px; display: block; object-fit: contain; }
-  /* Desktop: nav-links centrati in modo assoluto */
+  /* nav-links: sempre a tendina */
   .nav-links {
-    display: flex; gap: 2rem; list-style: none;
-    position: absolute; left: 50%; transform: translateX(-50%);
-    z-index: 101;
+    display: none; flex-direction: column; list-style: none;
+    position: fixed; top: 72px; left: 0; right: 0;
+    background: var(--white); border-bottom: 1px solid #e0e8ff;
+    padding: 1rem 2.5rem; gap: 1rem;
+    box-shadow: 0 4px 12px rgba(45,91,227,0.1);
+    z-index: 99;
   }
-  .nav-links a { text-decoration: none; color: var(--text-mid); font-size: 0.93rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links.open { display: flex; }
+  .nav-links a { text-decoration: none; color: var(--text-mid); font-size: 1rem; font-weight: 500; transition: color 0.2s; }
   .nav-links a:hover { color: var(--blue); }
-  .nav-cta { background: var(--blue); color: var(--white); padding: 0.5rem 1.3rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; white-space: nowrap; }
-  .nav-cta:hover { background: var(--blue-dark); }
+  /* Get in Touch nel menu: sempre visibile */
+  .get-in-touch-mobile { display: list-item; }
+  .get-in-touch-mobile a { color: var(--blue) !important; font-weight: 700 !important; }
+  /* nav-cta e nav-cta-float nascosti */
+  .nav-cta { display: none; }
+  .nav-cta-float { display: none; }
 
-  /* HAMBURGER: nascosto su desktop */
-  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px 4px; }
+  /* HAMBURGER: sempre visibile */
+  .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px 4px; }
   .hamburger span { display: block; width: 24px; height: 2px; background: var(--blue-dark); border-radius: 2px; transition: all 0.3s; }
-  /* "Get in Touch" nel menu hamburger: nascosto su desktop */
-  .get-in-touch-mobile { display: none; }
 
   /* HERO */
   .hero {
@@ -135,32 +141,10 @@
   footer { background: var(--blue-dark); color: rgba(255,255,255,0.75); text-align: center; padding: 2rem 1.5rem; font-size: 0.85rem; }
   footer strong { color: var(--white); }
 
-  /* DESKTOP: nav-cta e nav-cta-float nascosti dalla nav */
-  .nav-cta { display: none; }
-  /* Su desktop nasconde la voce Get in Touch nel menu hamburger */
-  .get-in-touch-mobile { display: none; }
-
   /* MOBILE */
   @media (max-width: 680px) {
     nav { padding: 0 1rem; height: 60px; }
-    .nav-links {
-      position: fixed; top: 60px; left: 0; right: 0;
-      transform: none;
-      display: none; flex-direction: column;
-      background: var(--white); border-bottom: 1px solid #e0e8ff;
-      padding: 1rem 1.5rem; gap: 1rem;
-      box-shadow: 0 4px 12px rgba(45,91,227,0.1);
-      z-index: 99;
-    }
-    .nav-links.open { display: flex; }
-    .nav-links a { font-size: 1rem; }
-    /* Mostra "Get in Touch" dentro il menu hamburger su mobile */
-    .get-in-touch-mobile { display: list-item; }
-    .get-in-touch-mobile a { color: var(--blue); font-weight: 700; }
-    /* Hamburger visibile su mobile */
-    .hamburger { display: flex; }
-    /* nav-cta-float nascosto su mobile */
-    .nav-cta-float { display: none; }
+    .nav-links { top: 60px; padding: 1rem 1.5rem; }
     .about-grid { grid-template-columns: 1fr; }
     section { padding: 3rem 1.25rem; }
     .hero { padding: 3.5rem 1.25rem 3rem; }
