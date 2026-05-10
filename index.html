@@ -91,6 +91,8 @@
 
   /* SECTIONS */
   section { padding: 5rem 2.5rem; }
+  /* Compensazione altezza navbar per anchor scroll */
+  section[id] { scroll-margin-top: 80px; }
   .section-inner { max-width: 960px; margin: 0 auto; }
   .section-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cyan); margin-bottom: 0.6rem; }
   .section-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; color: var(--text-dark); margin-bottom: 1rem; }
@@ -145,6 +147,7 @@
   @media (max-width: 680px) {
     nav { padding: 0 1rem; height: 60px; }
     .nav-links { top: 60px; padding: 1rem 1.5rem; }
+    section[id] { scroll-margin-top: 68px; }
     .about-grid { grid-template-columns: 1fr; }
     section { padding: 3rem 1.25rem; }
     .hero { padding: 3.5rem 1.25rem 3rem; }
@@ -223,6 +226,7 @@
     <div class="about-grid">
       <div class="about-text">
         <p class="section-label"><span class="en">Who We Are</span><span class="it">Chi Siamo</span></p>
+        <h2 class="section-title"><span class="en">Our DNA</span><span class="it">Il Nostro DNA</span></h2>
         <p class="en-block">At the intersection of financial precision and agile delivery, our firm provides elite managerial consultancy services designed to modernize your back-office operations. With over 8 years of proven expertise, we bridge the gap between complex legacy processes and high-performing, cloud-integrated financial ecosystems.</p>
         <p class="it-block">All'incrocio tra precisione finanziaria e consegna agile, la nostra azienda offre servizi di consulenza manageriale d'élite progettati per modernizzare le operazioni di back-office. Con oltre 8 anni di comprovata esperienza, colmiamo il divario tra processi legacy complessi ed ecosistemi finanziari ad alte prestazioni integrati nel cloud.</p>
         <p class="en-block" style="margin-top:1rem;">We specialize in the heavy hitters of enterprise resource planning (ERP) and project management, ensuring your data flows seamlessly and your projects finish on time.</p>
