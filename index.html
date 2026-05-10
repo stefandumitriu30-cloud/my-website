@@ -143,7 +143,15 @@
   /* MOBILE */
   @media (max-width: 680px) {
     nav { padding: 0 1rem; height: 60px; }
-    .nav-links { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: var(--white); border-bottom: 1px solid #e0e8ff; padding: 1rem 1.5rem; gap: 1rem; box-shadow: 0 4px 12px rgba(45,91,227,0.1); }
+    .nav-links {
+      position: fixed; top: 60px; left: 0; right: 0;
+      transform: none;
+      display: none; flex-direction: column;
+      background: var(--white); border-bottom: 1px solid #e0e8ff;
+      padding: 1rem 1.5rem; gap: 1rem;
+      box-shadow: 0 4px 12px rgba(45,91,227,0.1);
+      z-index: 99;
+    }
     .nav-links.open { display: flex; }
     .nav-links a { font-size: 1rem; }
     /* Mostra "Get in Touch" dentro il menu hamburger su mobile */
