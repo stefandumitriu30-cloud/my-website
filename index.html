@@ -382,7 +382,7 @@
     document.getElementById('nav-links').classList.remove('open');
   }
 
-  // Pronuncia "Vantage Finance and Tech" - bottone on/off, parte sempre su OFF
+  // Pronuncia - bottone on/off, parte sempre su OFF
   var _speakerOn = false;
 
   function updateSpeakerBtn() {
@@ -399,13 +399,65 @@
     }
   }
 
-  function getBestVoice() {
+  function getCurrentLang() {
+    var root = document.getElementById('html-root');
+    return root && root.className.includes('lang-it') ? 'it' : 'en';
+  }
+
+  function getSpeechConfig() {
+    if (getCurrentLang() === 'it') {
+      return [
+        {
+          text: 'Vantage Finance and Tech',
+          lang: 'en-US',
+          voiceMatch: /female|woman|girl|zira|samantha|karen|victoria|moira|fiona|tessa|susan|heather|kate/i,
+          langPrefix: 'en'
+        },
+        {
+          text: 'La nostra azienda offre servizi di consulenza manageriale d\'élite progettati per modernizzare le operazioni di back-office.',
+          lang: 'it-IT',
+          voiceMatch: /female|woman|girl|alice|federica|italiana/i,
+          langPrefix: 'it'
+        }
+      ];
+    } else {
+      return [
+        {
+          text: 'Vantage Finance and Tech, Our firm provides elite managerial consultancy services designed to modernize your back-office operations.',
+          lang: 'en-US',
+          voiceMatch: /female|woman|girl|zira|samantha|karen|victoria|moira|fiona|tessa|susan|heather|kate/i,
+          langPrefix: 'en'
+        }
+      ];
+    }
+  }
+
+  function getBestVoice(cfg) {
     var voices = window.speechSynthesis.getVoices();
-    var female = voices.find(function(v) {
-      return v.lang.startsWith('en') &&
-        /female|woman|girl|zira|samantha|karen|victoria|moira|fiona|tessa|susan|heather|kate/i.test(v.name);
+    var match = voices.find(function(v) {
+      return v.lang.startsWith(cfg.langPrefix) && cfg.voiceMatch.test(v.name);
     });
-    return female || voices.find(function(v) { return v.lang.startsWith('en'); }) || null;
+    return match || voices.find(function(v) { return v.lang.startsWith(cfg.langPrefix); }) || null;
+  }
+
+  function buildUtterance(cfg, voice) {
+    var u = new SpeechSynthesisUtterance(cfg.text);
+    u.lang = cfg.lang;
+    u.rate = 0.9;
+    u.pitch = 1.2;
+    if (voice) u.voice = voice;
+    return u;
+  }
+
+  function speakSegments(segments, voices) {
+    if (!segments.length) return;
+    var seg = segments[0];
+    var rest = segments.slice(1);
+    var u = buildUtterance(seg, voices ? getBestVoice(seg) : null);
+    if (rest.length) {
+      u.onend = function() { speakSegments(rest, true); };
+    }
+    window.speechSynthesis.speak(u);
   }
 
   function toggleSpeaker() {
@@ -418,31 +470,17 @@
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
 
-    var utter = new SpeechSynthesisUtterance('Vantage Finance and Tech');
-    utter.lang = 'en-US';
-    utter.rate = 0.9;
-    utter.pitch = 1.2;
+    var segments = getSpeechConfig();
+    var voices = window.speechSynthesis.getVoices();
 
-    var voice = getBestVoice();
-    if (voice) {
-      // Voci già disponibili (desktop / Android Chrome)
-      utter.voice = voice;
-      window.speechSynthesis.speak(utter);
+    if (voices.length) {
+      speakSegments(segments, true);
     } else {
-      // Voci non ancora caricate (Safari iOS): speak() senza voce subito,
-      // poi aggiorna con la voce giusta appena disponibile
-      window.speechSynthesis.speak(utter);
+      // Safari iOS: parla subito senza voce per sbloccare l'audio
+      speakSegments(segments, false);
       window.speechSynthesis.addEventListener('voiceschanged', function() {
-        var v = getBestVoice();
-        if (v) {
-          window.speechSynthesis.cancel();
-          var utter2 = new SpeechSynthesisUtterance('Vantage Finance and Tech');
-          utter2.lang = 'en-US';
-          utter2.rate = 0.9;
-          utter2.pitch = 1.2;
-          utter2.voice = v;
-          window.speechSynthesis.speak(utter2);
-        }
+        window.speechSynthesis.cancel();
+        speakSegments(segments, true);
       }, { once: true });
     }
   }
