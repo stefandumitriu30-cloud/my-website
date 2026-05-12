@@ -86,6 +86,8 @@
   .hero p.hero-desc { font-size: 1.1rem; opacity: 0.9; max-width: 580px; margin: 0 auto 2rem; }
   .hero-badges { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; }
   .badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); color: var(--white); padding: 0.35rem 1rem; border-radius: 100px; font-size: 0.82rem; font-weight: 500; }
+  a.badge { text-decoration: none; transition: background 0.2s, border-color 0.2s, transform 0.15s; cursor: pointer; }
+  a.badge:hover { background: rgba(255,255,255,0.28); border-color: rgba(255,255,255,0.7); transform: translateY(-2px); }
   .hero-cta { display: inline-block; margin-top: 2.5rem; background: var(--white); color: var(--blue); padding: 0.85rem 2.2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(0,0,0,0.18); }
   .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.22); }
 
@@ -128,6 +130,7 @@
   a.spec-pill { text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.2s, border-color 0.2s, transform 0.15s; cursor: pointer; }
   a.spec-pill:hover { background: rgba(0,174,239,0.3); border-color: var(--cyan); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,174,239,0.25); }
   a.spec-pill::after { content: '↗'; font-size: 0.75rem; opacity: 0.75; }
+  a.spec-pill.pill-internal::after { content: '↓'; }
   @media (max-width: 680px) {
     .spec-pills { gap: 0.5rem; }
     .spec-pill { font-size: 0.82rem; padding: 0.4rem 0.85rem; white-space: normal; text-align: center; }
@@ -214,16 +217,10 @@
     <p class="hero-desc en-block">Our firm provides elite managerial consultancy services designed to modernize your back-office operations.</p>
     <p class="hero-desc it-block">La nostra azienda offre servizi di consulenza manageriale d'élite progettati per modernizzare le operazioni di back-office.</p>
     <div class="hero-badges">
-      <span class="badge">Oracle ERP Cloud</span>
-      <span class="badge">SAP FI</span>
-      <span class="badge en">PMO &amp; Project Management</span>
-      <span class="badge it">PMO &amp; Project Management</span>
-      <span class="badge en">8+ Years Experience</span>
-      <span class="badge it">8+ Anni di Esperienza</span>
+      <a class="badge" href="#services"><span class="en">Oracle ERP Cloud</span><span class="it">Oracle ERP Cloud</span></a>
+      <a class="badge" href="#services"><span class="en">SAP FI</span><span class="it">SAP FI</span></a>
+      <a class="badge" href="#services"><span class="en">PMO &amp; Project Management</span><span class="it">PMO &amp; Project Management</span></a>
     </div>
-    <a href="#services" class="hero-cta">
-      <span class="en">Explore Our Services</span><span class="it">Scopri i Nostri Servizi</span>
-    </a>
   </div>
 </section>
 
