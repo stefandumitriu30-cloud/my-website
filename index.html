@@ -399,18 +399,23 @@
     }
   }
 
+  function getBestVoice() {
+    var voices = window.speechSynthesis.getVoices();
+    var female = voices.find(function(v) {
+      return v.lang.startsWith('en') &&
+        /female|woman|girl|zira|samantha|karen|victoria|moira|fiona|tessa|susan|heather|kate/i.test(v.name);
+    });
+    return female || voices.find(function(v) { return v.lang.startsWith('en'); }) || null;
+  }
+
   function toggleSpeaker() {
     _speakerOn = !_speakerOn;
     updateSpeakerBtn();
-    if (_speakerOn) {
-      doSpeak();
-    } else {
+    if (!_speakerOn) {
       window.speechSynthesis && window.speechSynthesis.cancel();
+      return;
     }
-  }
-
-  function doSpeak() {
-    if (!_speakerOn || !window.speechSynthesis) return;
+    if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
 
     var utter = new SpeechSynthesisUtterance('Vantage Finance and Tech');
@@ -418,24 +423,31 @@
     utter.rate = 0.9;
     utter.pitch = 1.2;
 
-    function speak() {
-      var voices = window.speechSynthesis.getVoices();
-      var female = voices.find(function(v) {
-        return v.lang.startsWith('en') && /female|woman|girl|zira|samantha|karen|victoria|moira|fiona|tessa|susan|heather|kate/i.test(v.name);
-      });
-      if (!female) {
-        female = voices.find(function(v) { return v.lang.startsWith('en'); });
-      }
-      if (female) utter.voice = female;
+    var voice = getBestVoice();
+    if (voice) {
+      // Voci già disponibili (desktop / Android Chrome)
+      utter.voice = voice;
       window.speechSynthesis.speak(utter);
-    }
-
-    if (window.speechSynthesis.getVoices().length) {
-      speak();
     } else {
-      window.speechSynthesis.addEventListener('voiceschanged', function() { speak(); }, { once: true });
+      // Voci non ancora caricate (Safari iOS): speak() senza voce subito,
+      // poi aggiorna con la voce giusta appena disponibile
+      window.speechSynthesis.speak(utter);
+      window.speechSynthesis.addEventListener('voiceschanged', function() {
+        var v = getBestVoice();
+        if (v) {
+          window.speechSynthesis.cancel();
+          var utter2 = new SpeechSynthesisUtterance('Vantage Finance and Tech');
+          utter2.lang = 'en-US';
+          utter2.rate = 0.9;
+          utter2.pitch = 1.2;
+          utter2.voice = v;
+          window.speechSynthesis.speak(utter2);
+        }
+      }, { once: true });
     }
   }
+
+  function doSpeak() {} // compatibilità
 
   window.addEventListener('load', function() {
     updateSpeakerBtn();
