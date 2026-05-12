@@ -370,8 +370,12 @@
   }
 
   // Pronounce "Vantage Finance and Tech" in female American English voice - once only
+  var _vantageSpoken = false;
+
   function pronounceVantage() {
-    if (!window.speechSynthesis) return;
+    if (_vantageSpoken || !window.speechSynthesis) return;
+    _vantageSpoken = true;
+
     var utter = new SpeechSynthesisUtterance('Vantage Finance and Tech');
     utter.lang = 'en-US';
     utter.rate = 0.9;
@@ -397,7 +401,17 @@
   }
 
   window.addEventListener('load', function() {
+    // Desktop: try immediately
     pronounceVantage();
+
+    // Mobile fallback: trigger on first touch/click (once only)
+    function onFirstInteraction() {
+      pronounceVantage();
+      document.removeEventListener('click', onFirstInteraction, true);
+      document.removeEventListener('touchend', onFirstInteraction, true);
+    }
+    document.addEventListener('click', onFirstInteraction, true);
+    document.addEventListener('touchend', onFirstInteraction, true);
   });
 </script>
 </body>
