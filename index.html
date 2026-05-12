@@ -125,6 +125,9 @@
   .specialities .section-title { color: var(--white); }
   .spec-pills { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
   .spec-pill { background: rgba(255,255,255,0.1); border: 1.5px solid rgba(0,174,239,0.5); color: var(--white); padding: 0.5rem 1.1rem; border-radius: 100px; font-size: 0.9rem; font-weight: 600; line-height: 1.4; white-space: nowrap; }
+  a.spec-pill { text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: background 0.2s, border-color 0.2s, transform 0.15s; cursor: pointer; }
+  a.spec-pill:hover { background: rgba(0,174,239,0.3); border-color: var(--cyan); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,174,239,0.25); }
+  a.spec-pill::after { content: '↗'; font-size: 0.75rem; opacity: 0.75; }
   @media (max-width: 680px) {
     .spec-pills { gap: 0.5rem; }
     .spec-pill { font-size: 0.82rem; padding: 0.4rem 0.85rem; white-space: normal; text-align: center; }
@@ -290,11 +293,11 @@
     <p class="en-block" style="color:rgba(255,255,255,0.8); max-width:600px; margin-bottom:1rem;">We operate at the forefront of IT Services and IT Consulting, with deep expertise in the following domains:</p>
     <p class="it-block" style="color:rgba(255,255,255,0.8); max-width:600px; margin-bottom:1rem;">Operiamo all'avanguardia dei Servizi IT e della Consulenza IT, con profonda esperienza nei seguenti ambiti:</p>
     <div class="spec-pills">
-      <span class="spec-pill"><span class="en">Retail</span><span class="it">Retail</span></span>
-      <span class="spec-pill"><span class="en">Financial Services</span><span class="it">Servizi Finanziari</span></span>
-      <span class="spec-pill"><span class="en">Utilities</span><span class="it">Utilities</span></span>
-      <span class="spec-pill"><span class="en">Automotive</span><span class="it">Automotive</span></span>
-      <span class="spec-pill"><span class="en">Manufacturing</span><span class="it">Manifattura</span></span>
+      <a class="spec-pill" href="Vantage_Oracle_Fusion_ERP_Retail.pdf" target="_blank" rel="noopener"><span class="en">Retail</span><span class="it">Retail</span></a>
+      <a class="spec-pill" href="Vantage_Oracle_Fusion_ERP_Financial_Services.pdf" target="_blank" rel="noopener"><span class="en">Financial Services</span><span class="it">Servizi Finanziari</span></a>
+      <a class="spec-pill" href="Oracle_Fusion_ERP_Utilities_Architecture.pdf" target="_blank" rel="noopener"><span class="en">Utilities</span><span class="it">Utilities</span></a>
+      <a class="spec-pill" href="Automotive_ERP_and_EPM_Architecture.pdf" target="_blank" rel="noopener"><span class="en">Automotive</span><span class="it">Automotive</span></a>
+      <a class="spec-pill" href="Oracle_Fusion_ERP_Manufacturing_Architecture.pdf" target="_blank" rel="noopener"><span class="en">Manufacturing</span><span class="it">Manifattura</span></a>
     </div>
   </div>
 </section>
