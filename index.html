@@ -91,7 +91,8 @@
   .hero-cta { display: inline-block; margin-top: 2.5rem; background: var(--white); color: var(--blue); padding: 0.85rem 2.2rem; border-radius: 8px; font-weight: 700; font-size: 1rem; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 20px rgba(0,0,0,0.18); }
   .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.22); }
 
-  /* SECTIONS */
+  /* Scroll offset per le service card anchor */
+  .service-icon[id] { scroll-margin-top: 120px; }
   section { padding: 5rem 2.5rem; }
   /* Compensazione altezza navbar per anchor scroll */
   section[id] { scroll-margin-top: 80px; }
@@ -254,24 +255,24 @@
     <p class="section-sub en-block">We specialize in enterprise resource planning and project management, delivering cloud-integrated solutions that drive real business value.</p>
     <p class="section-sub it-block">Siamo specializzati nella pianificazione delle risorse aziendali e nel project management, fornendo soluzioni integrate nel cloud che generano valore reale per il business.</p>
     <div class="services-grid">
-      <div class="service-card" id="service-oracle">
-        <div class="service-icon">
+      <div class="service-card">
+        <div class="service-icon" id="service-oracle">
           <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><polyline points="2,17 12,22 22,17"/><polyline points="2,12 12,17 22,12"/></svg>
         </div>
         <h3>Oracle Cloud ERP Finance</h3>
         <p class="en-block">Deep-dive architectural support and implementation, ensuring your cloud transition is more than just a migration — it's an optimization.</p>
         <p class="it-block">Supporto architetturale approfondito e implementazione, per garantire che la transizione al cloud sia più di una semplice migrazione — una vera ottimizzazione.</p>
       </div>
-      <div class="service-card" id="service-sap">
-        <div class="service-icon">
+      <div class="service-card">
+        <div class="service-icon" id="service-sap">
           <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         </div>
         <h3>SAP FI (Financial Accounting)</h3>
         <p class="en-block">Expertise in streamlining General Ledger, Accounts Payable, and Accounts Receivable within the SAP environment to ensure robust reporting and compliance.</p>
         <p class="it-block">Competenza nell'ottimizzazione della Contabilità Generale, della Contabilità Fornitori e della Contabilità Clienti nell'ambiente SAP per garantire reporting robusto e conformità.</p>
       </div>
-      <div class="service-card" id="service-pmo">
-        <div class="service-icon">
+      <div class="service-card">
+        <div class="service-icon" id="service-pmo">
           <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
         <h3><span class="en">PMO &amp; Project Management Support</span><span class="it">PMO &amp; Supporto al Project Management</span></h3>
