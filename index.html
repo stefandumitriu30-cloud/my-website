@@ -368,6 +368,50 @@
   function closeMenu() {
     document.getElementById('nav-links').classList.remove('open');
   }
+
+  // Pronounce "Vantage" in female English voice on page load
+  function pronounceVantage() {
+    if (!window.speechSynthesis) return;
+    var utter = new SpeechSynthesisUtterance('Vantage Finance and Tech');
+    utter.lang = 'en-US';
+    utter.rate = 0.9;
+    utter.pitch = 1.2;
+
+    function speak() {
+      var voices = window.speechSynthesis.getVoices();
+      // Prefer a female English voice
+      var female = voices.find(function(v) {
+        return v.lang.startsWith('en') && /female|woman|girl|zira|samantha|karen|victoria|moira|fiona|tessa|susan|heather|kate/i.test(v.name);
+      });
+      if (!female) {
+        // Fallback: any English voice
+        female = voices.find(function(v) { return v.lang.startsWith('en'); });
+      }
+      if (female) utter.voice = female;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Voices may not be loaded yet
+    if (window.speechSynthesis.getVoices().length) {
+      speak();
+    } else {
+      window.speechSynthesis.addEventListener('voiceschanged', function() { speak(); }, { once: true });
+    }
+  }
+
+  // Trigger on first user interaction (required by browsers) or directly if allowed
+  window.addEventListener('load', function() {
+    // Try direct play first (some browsers allow it)
+    pronounceVantage();
+    // Fallback: trigger on first click/touch anywhere
+    function onFirstInteraction() {
+      pronounceVantage();
+      document.removeEventListener('click', onFirstInteraction);
+      document.removeEventListener('touchstart', onFirstInteraction);
+    }
+    document.addEventListener('click', onFirstInteraction);
+    document.addEventListener('touchstart', onFirstInteraction);
+  });
 </script>
 </body>
 </html>
