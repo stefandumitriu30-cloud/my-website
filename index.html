@@ -374,6 +374,22 @@
     root.className = 'lang-' + lang;
     document.getElementById('btn-en').classList.toggle('active', lang === 'en');
     document.getElementById('btn-it').classList.toggle('active', lang === 'it');
+
+    // Se il megafono è attivo mentre si cambia lingua, riparte nella nuova lingua
+    if (_speakerOn && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      var segments = getSpeechConfig();
+      var voices = window.speechSynthesis.getVoices();
+      if (voices.length) {
+        speakSegments(segments, true);
+      } else {
+        speakSegments(segments, false);
+        window.speechSynthesis.addEventListener('voiceschanged', function() {
+          window.speechSynthesis.cancel();
+          speakSegments(segments, true);
+        }, { once: true });
+      }
+    }
   }
   function toggleMenu() {
     document.getElementById('nav-links').classList.toggle('open');
