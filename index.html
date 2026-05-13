@@ -369,28 +369,34 @@
 </footer>
 
 <script>
+  // --- Stato speaker ---
+  var _speakerOn = false;
+  var _speechSession = 0; // incrementato ad ogni cancel: invalida i callback onend pendenti
+
+  // --- Lingua ---
+  function getCurrentLang() {
+    var root = document.getElementById('html-root');
+    return root && root.className.includes('lang-it') ? 'it' : 'en';
+  }
+
   function setLang(lang) {
     var root = document.getElementById('html-root');
+    var prevLang = getCurrentLang();
+
     root.className = 'lang-' + lang;
     document.getElementById('btn-en').classList.toggle('active', lang === 'en');
     document.getElementById('btn-it').classList.toggle('active', lang === 'it');
 
-    // Se il megafono è attivo mentre si cambia lingua, riparte nella nuova lingua
-    if (_speakerOn && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      var segments = getSpeechConfig();
-      var voices = window.speechSynthesis.getVoices();
-      if (voices.length) {
-        speakSegments(segments, true);
-      } else {
-        speakSegments(segments, false);
-        window.speechSynthesis.addEventListener('voiceschanged', function() {
-          window.speechSynthesis.cancel();
-          speakSegments(segments, true);
-        }, { once: true });
-      }
+    // Se la lingua è cambiata davvero e il megafono è attivo: ferma e metti OFF
+    if (lang !== prevLang && _speakerOn) {
+      _speakerOn = false;
+      _speechSession++; // invalida tutti i callback onend in sospeso
+      updateSpeakerBtn();
+      window.speechSynthesis && window.speechSynthesis.cancel();
     }
   }
+
+  // --- Menu ---
   function toggleMenu() {
     document.getElementById('nav-links').classList.toggle('open');
   }
@@ -398,9 +404,7 @@
     document.getElementById('nav-links').classList.remove('open');
   }
 
-  // Pronuncia - bottone on/off, parte sempre su OFF
-  var _speakerOn = false;
-
+  // --- Speaker UI ---
   function updateSpeakerBtn() {
     var btn = document.getElementById('nav-speaker-btn');
     if (!btn) return;
@@ -415,11 +419,7 @@
     }
   }
 
-  function getCurrentLang() {
-    var root = document.getElementById('html-root');
-    return root && root.className.includes('lang-it') ? 'it' : 'en';
-  }
-
+  // --- Speech config ---
   function getSpeechConfig() {
     if (getCurrentLang() === 'it') {
       return [
@@ -465,46 +465,57 @@
     return u;
   }
 
-  function resetSpeaker() {
-    _speakerOn = false;
-    updateSpeakerBtn();
-  }
-
-  function speakSegments(segments, voices) {
+  // Parla una lista di segmenti; session garantisce che i callback stantii non agiscano
+  function speakSegments(segments, withVoice, session) {
     if (!segments.length) return;
+    // Se la sessione è cambiata, questo callback è stantio: ignoralo
+    if (session !== _speechSession) return;
+
     var seg = segments[0];
     var rest = segments.slice(1);
-    var u = buildUtterance(seg, voices ? getBestVoice(seg) : null);
-    if (rest.length) {
-      u.onend = function() { speakSegments(rest, true); };
-    } else {
-      // Ultimo segmento: al termine resetta il bottone su OFF
-      u.onend = function() { resetSpeaker(); };
-    }
+    var u = buildUtterance(seg, withVoice ? getBestVoice(seg) : null);
+
+    u.onend = function() {
+      if (session !== _speechSession) return; // sessione invalidata: non fare nulla
+      if (rest.length) {
+        speakSegments(rest, true, session);
+      } else {
+        // Ultimo segmento finito naturalmente: spegni il megafono
+        _speakerOn = false;
+        updateSpeakerBtn();
+      }
+    };
+
     window.speechSynthesis.speak(u);
   }
 
   function toggleSpeaker() {
     _speakerOn = !_speakerOn;
     updateSpeakerBtn();
+
     if (!_speakerOn) {
+      _speechSession++;
       window.speechSynthesis && window.speechSynthesis.cancel();
       return;
     }
+
     if (!window.speechSynthesis) return;
+    _speechSession++;
     window.speechSynthesis.cancel();
 
+    var session = _speechSession;
     var segments = getSpeechConfig();
     var voices = window.speechSynthesis.getVoices();
 
     if (voices.length) {
-      speakSegments(segments, true);
+      speakSegments(segments, true, session);
     } else {
       // Safari iOS: parla subito senza voce per sbloccare l'audio
-      speakSegments(segments, false);
+      speakSegments(segments, false, session);
       window.speechSynthesis.addEventListener('voiceschanged', function() {
+        if (session !== _speechSession) return;
         window.speechSynthesis.cancel();
-        speakSegments(segments, true);
+        speakSegments(segments, true, session);
       }, { once: true });
     }
   }
