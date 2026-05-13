@@ -449,6 +449,11 @@
     return u;
   }
 
+  function resetSpeaker() {
+    _speakerOn = false;
+    updateSpeakerBtn();
+  }
+
   function speakSegments(segments, voices) {
     if (!segments.length) return;
     var seg = segments[0];
@@ -456,6 +461,9 @@
     var u = buildUtterance(seg, voices ? getBestVoice(seg) : null);
     if (rest.length) {
       u.onend = function() { speakSegments(rest, true); };
+    } else {
+      // Ultimo segmento: al termine resetta il bottone su OFF
+      u.onend = function() { resetSpeaker(); };
     }
     window.speechSynthesis.speak(u);
   }
