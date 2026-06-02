@@ -167,8 +167,9 @@
   .contact-photo-col img { width:160px; height:210px; object-fit:cover; object-position:top center; border-radius:10px; box-shadow:0 4px 18px rgba(45,91,227,0.13); border:2px solid var(--gray-mid); }
   .contact-photo-caption { margin-top:0.6rem; font-size:0.78rem; font-weight:600; color:var(--text-gray); text-align:center; letter-spacing:0.03em; }
   @media(max-width:680px){
-    .contact-inner-wrap { gap:1.25rem; }
-    .contact-photo-col img { width:100px; height:132px; }
+    .contact-inner-wrap { gap:1.25rem; flex-direction:column; align-items:center; }
+    .contact-photo-col { order:-1; }
+    .contact-photo-col img { width:120px; height:158px; }
   }
 
   /* FOOTER */
@@ -277,6 +278,11 @@
       100% { transform: translateX(-50%); }
     }
     .tb-div { margin:0 6px; }
+    /* Su mobile la news track non si anima autonomamente — scorre col wrapper */
+    .tb-news-track { animation:none !important; }
+    .tb-news-wrap { flex:none; overflow:visible; }
+    .tb-news-wrap::before { display:none; }
+    .tb-news-inner { overflow:visible; flex:none; }
   }
 </style>
 </head>
@@ -350,10 +356,24 @@
     var topbar=document.getElementById('vft-topbar');
     var inner=document.getElementById('vft-topbar-inner');
     if(!topbar||!inner)return;
+
+    // On mobile: news track should show only ONE set of items (not doubled)
+    // because the outer wrapper handles the looping
+    var track=document.getElementById('vft-news-track');
+    if(track){
+      // Remove the duplicate half that was added for the CSS loop
+      var items=track.querySelectorAll('.tb-news-item, .tb-news-sep');
+      var total=items.length;
+      var half=Math.floor(total/2);
+      for(var i=total-1;i>=half;i--){
+        if(items[i].parentNode)items[i].parentNode.removeChild(items[i]);
+      }
+    }
+
     // Create wrapper that holds original + clone
     var wrap=document.createElement('div');
     wrap.id='vft-topbar-scroll';
-    wrap.style.cssText='display:flex;align-items:center;gap:0;animation:tbBarScroll 130s linear infinite;';
+    wrap.style.cssText='display:flex;align-items:center;gap:0;animation:tbBarScroll 130s linear infinite;white-space:nowrap;';
     // Move original inner into wrapper
     topbar.removeChild(inner);
     wrap.appendChild(inner);
