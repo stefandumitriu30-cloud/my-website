@@ -19,7 +19,7 @@
     --radius: 12px;
   }
   html { scroll-behavior: smooth; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text-dark); background: var(--white); line-height: 1.7; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text-dark); background: var(--white); line-height: 1.7; padding-top:36px; }
 
   /* LANG SWITCHER — integrato nella nav, non più fixed */
   .lang-switcher {
@@ -204,7 +204,7 @@
   #vft-topbar {
     width:100%; background:#0D1B2A; height:36px;
     display:flex; align-items:center; padding:0 16px;
-    position:sticky; top:0; z-index:1000; overflow:hidden; gap:0;
+    position:fixed; top:0; z-index:1000; overflow:hidden; gap:0;
   }
   #vft-topbar-inner {
     display:flex; align-items:center; gap:0; width:100%;
@@ -220,7 +220,7 @@
   .tb-news-wrap::before { content:''; position:absolute; left:0; top:0; bottom:0; width:28px; background:linear-gradient(to right,#0D1B2A,transparent); z-index:2; pointer-events:none; }
   .tb-news-label { font-size:9px; font-weight:700; color:#FF8000; letter-spacing:.8px; text-transform:uppercase; background:rgba(255,128,0,.14); border:.5px solid rgba(255,128,0,.35); border-radius:3px; padding:2px 6px; flex-shrink:0; margin-right:8px; z-index:3; }
   .tb-news-inner { flex:1; overflow:hidden; min-width:0; }
-  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 75s linear infinite; }
+  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 50s linear infinite; }
   .tb-news-track:hover { animation-play-state:paused; }
   @keyframes tbNewsScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
   .tb-news-item { display:inline-flex; align-items:center; gap:5px; padding:0 22px 0 0; font-size:11.5px; color:#C8D8F0; }
@@ -242,7 +242,7 @@
   .tb-live-dot { width:6px; height:6px; border-radius:50%; background:#4ADE80; animation:tbBlink 2s infinite; }
   @keyframes tbBlink { 0%,100%{opacity:1} 50%{opacity:.25} }
   /* Stock panel */
-  #vft-stock-panel { display:none; background:#0f1e30; border-bottom:1px solid rgba(255,255,255,.07); padding:12px 16px; gap:12px; flex-wrap:wrap; position:sticky; top:36px; z-index:999; }
+  #vft-stock-panel { display:none; background:#0f1e30; border-bottom:1px solid rgba(255,255,255,.07); padding:12px 16px; gap:12px; flex-wrap:wrap; position:fixed; top:36px; z-index:999; }
   #vft-stock-panel.open { display:flex; }
   .vft-sc { flex:1; min-width:230px; background:rgba(255,255,255,.04); border:.5px solid rgba(255,255,255,.09); border-radius:8px; padding:10px 14px; }
   .vft-sc.hl { border-color:#2D5BE3; }
@@ -262,6 +262,8 @@
   /* Offset sticky nav for topbar */
   nav { top:36px !important; }
   @media(max-width:768px){
+    body { padding-top:0; }
+    #vft-topbar { position:relative; }
     #vft-topbar {
       padding:0;
       overflow: hidden;
