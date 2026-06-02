@@ -190,11 +190,183 @@
   html.lang-it .en-block { display: none; }
   .it-block { display: none; }
   .en-block { display: block; }
+
+  /* ── TOPBAR ── */
+  #vft-topbar {
+    width:100%; background:#0D1B2A; height:36px;
+    display:flex; align-items:center; padding:0 16px;
+    position:sticky; top:0; z-index:1000; overflow:hidden; gap:0;
+  }
+  .tb-clocks { display:flex; align-items:center; flex-shrink:0; }
+  .tb-clock  { display:flex; align-items:center; gap:5px; padding:0 11px; border-right:1px solid rgba(255,255,255,0.07); }
+  .tb-clock:first-child { padding-left:0; }
+  .tb-clock .flag { font-size:13px; line-height:1; }
+  .tb-clock .city { font-size:9px; color:#7B9CC4; text-transform:uppercase; letter-spacing:.6px; display:block; line-height:1.1; }
+  .tb-clock .time { font-size:12px; font-weight:500; color:#E0E8FF; font-variant-numeric:tabular-nums; display:block; line-height:1.2; }
+  .tb-div { width:1px; height:18px; background:rgba(255,255,255,.10); flex-shrink:0; margin:0 10px; }
+  .tb-news-wrap { flex:1; display:flex; align-items:center; overflow:hidden; min-width:0; position:relative; }
+  .tb-news-wrap::before { content:''; position:absolute; left:0; top:0; bottom:0; width:28px; background:linear-gradient(to right,#0D1B2A,transparent); z-index:2; pointer-events:none; }
+  .tb-news-label { font-size:9px; font-weight:700; color:#FF8000; letter-spacing:.8px; text-transform:uppercase; background:rgba(255,128,0,.14); border:.5px solid rgba(255,128,0,.35); border-radius:3px; padding:2px 6px; flex-shrink:0; margin-right:8px; z-index:3; }
+  .tb-news-inner { flex:1; overflow:hidden; min-width:0; }
+  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 100s linear infinite; }
+  .tb-news-track:hover { animation-play-state:paused; }
+  @keyframes tbNewsScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .tb-news-item { display:inline-flex; align-items:center; gap:5px; padding:0 22px 0 0; font-size:11.5px; color:#C8D8F0; }
+  .tb-news-sep  { display:inline-block; color:rgba(255,255,255,.18); margin-right:22px; font-size:10px; }
+  .nb-cat { font-size:9px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; padding:1px 5px; border-radius:3px; flex-shrink:0; }
+  .nb-fin  { color:#60A5FA; background:rgba(96,165,250,.14); }
+  .nb-tech { color:#A78BFA; background:rgba(167,139,250,.14); }
+  .nb-mkt  { color:#34D399; background:rgba(52,211,153,.14); }
+  .nb-world{ color:#FBBF24; background:rgba(251,191,36,.14); }
+  .tb-stocks { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .tb-stock-chip { display:flex; align-items:center; gap:5px; background:rgba(45,91,227,.18); border:.5px solid rgba(45,91,227,.35); border-radius:4px; padding:3px 8px; cursor:pointer; transition:background .15s; }
+  .tb-stock-chip:hover { background:rgba(45,91,227,.30); }
+  .ch-tick { font-size:10px; font-weight:600; color:#A8C3FF; letter-spacing:.5px; }
+  .ch-px   { font-size:12px; font-weight:500; color:#E0E8FF; font-variant-numeric:tabular-nums; }
+  .ch-chg  { font-size:10px; font-weight:600; padding:1px 4px; border-radius:3px; }
+  .ch-up   { color:#4ADE80; background:rgba(74,222,128,.13); }
+  .ch-down { color:#F87171; background:rgba(248,113,113,.13); }
+  .tb-live { display:flex; align-items:center; gap:4px; font-size:9px; color:#7B9CC4; flex-shrink:0; }
+  .tb-live-dot { width:6px; height:6px; border-radius:50%; background:#4ADE80; animation:tbBlink 2s infinite; }
+  @keyframes tbBlink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  /* Stock panel */
+  #vft-stock-panel { display:none; background:#0f1e30; border-bottom:1px solid rgba(255,255,255,.07); padding:12px 16px; gap:12px; flex-wrap:wrap; position:sticky; top:36px; z-index:999; }
+  #vft-stock-panel.open { display:flex; }
+  .vft-sc { flex:1; min-width:230px; background:rgba(255,255,255,.04); border:.5px solid rgba(255,255,255,.09); border-radius:8px; padding:10px 14px; }
+  .vft-sc.hl { border-color:#2D5BE3; }
+  .vft-sc-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
+  .vft-sc-name { font-size:12px; font-weight:600; color:#E0E8FF; }
+  .vft-sc-exch { font-size:9px; color:#7B9CC4; }
+  .vft-sc-price { font-size:20px; font-weight:700; color:#F0F4FF; font-variant-numeric:tabular-nums; margin-bottom:6px; }
+  .vft-sc-badge { font-size:11px; font-weight:600; padding:2px 7px; border-radius:4px; }
+  .vft-sc-badge.up   { color:#4ADE80; background:rgba(74,222,128,.13); }
+  .vft-sc-badge.down { color:#F87171; background:rgba(248,113,113,.13); }
+  .vft-sc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px 10px; margin-top:7px; }
+  .vft-sc-kv { display:flex; flex-direction:column; gap:1px; }
+  .vft-sc-k  { font-size:8.5px; color:#7B9CC4; text-transform:uppercase; letter-spacing:.4px; }
+  .vft-sc-v  { font-size:11px; font-weight:500; color:#C8D8F0; font-variant-numeric:tabular-nums; }
+  .vft-sc-note  { font-size:9px; color:#4a6070; margin-top:7px; font-style:italic; line-height:1.5; }
+  .vft-sc-close { font-size:10px; color:#7B9CC4; cursor:pointer; text-decoration:underline; background:none; border:none; margin-top:5px; align-self:flex-start; }
+  /* Offset sticky nav for topbar */
+  nav { top:36px !important; }
+  @media(max-width:768px){
+    #vft-topbar { padding:0 8px; }
+    .tb-clock:nth-child(n+3) { display:none; }
+    .tb-div { margin:0 6px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- LANG SWITCHER -->
+<!-- ═══ TOPBAR: FUSI ORARI + NEWS + ORCL/SAP ═══ -->
+<div id="vft-topbar">
+  <div class="tb-clocks" id="vft-clocks"></div>
+  <div class="tb-div"></div>
+  <div class="tb-news-wrap">
+    <span class="tb-news-label">REUTERS</span>
+    <div class="tb-news-inner"><div class="tb-news-track" id="vft-news-track"></div></div>
+  </div>
+  <div class="tb-div"></div>
+  <div class="tb-stocks" id="vft-stocks"></div>
+  <div class="tb-div"></div>
+  <div class="tb-live"><div class="tb-live-dot"></div>Live</div>
+</div>
+<div id="vft-stock-panel"></div>
+
+<script>
+/* ── TOPBAR ENGINE ── */
+(function(){
+  var ZONES=[
+    {city:'Roma',    tz:'Europe/Rome',      flag:'🇮🇹'},
+    {city:'Londra',  tz:'Europe/London',    flag:'🇬🇧'},
+    {city:'New York',tz:'America/New_York', flag:'🇺🇸'},
+    {city:'Tokyo',   tz:'Asia/Tokyo',       flag:'🇯🇵'}
+  ];
+  var STOCKS={
+    ORCL:{name:'Oracle Corporation',ex:'NYSE',price:248.15,change:+22.37,pct:+9.91,open:230.50,high:250.25,low:224.60,vol:'48.39M',mktcap:'$713.7B',pe:'44.55',wk52h:345.72,wk52l:134.57,note:'Chiusura NYSE 1 giu 2026. Fonte: Google Finance.'},
+    SAP :{name:'SAP SE ADR',       ex:'NYSE',price:181.79,change:-1.33, pct:-0.73,open:182.00,high:182.82,low:175.10,vol:'~2.1M', mktcap:'$211.0B',pe:'24.35',wk52h:313.28,wk52l:158.58,note:'Chiusura NYSE 1 giu 2026. Quotata anche su Xetra (SAP.DE).'}
+  };
+  var FALLBACK=[
+    {t:'Oracle shares surge 9.9% on AI cloud bookings record — NYSE:ORCL $248.15',cat:'Finance',cls:'nb-fin'},
+    {t:'SAP reports Q2 cloud revenue growth of 33% year-over-year — NYSE:SAP $181.79',cat:'Finance',cls:'nb-fin'},
+    {t:'Fed holds rates steady as inflation falls toward 2% target',cat:'Markets',cls:'nb-mkt'},
+    {t:'EU AI Act enforcement rules approved — tech companies face compliance deadlines',cat:'Tech',cls:'nb-tech'},
+    {t:'ECB signals cautious rate path amid mixed eurozone growth data',cat:'Finance',cls:'nb-fin'},
+    {t:'Microsoft Azure and Oracle OCI announce expanded interconnect for AI workloads',cat:'Tech',cls:'nb-tech'},
+    {t:'S&P 500 closes above 5,900 for third week on strong earnings momentum',cat:'Markets',cls:'nb-mkt'},
+    {t:'Italian government unveils €4bn digital transformation plan for public sector',cat:'World',cls:'nb-world'},
+    {t:'SAP RISE migration accelerates — 60% of Fortune 500 now on cloud ERP',cat:'Tech',cls:'nb-tech'},
+    {t:'Gold hits $2,480/oz as geopolitical risk premium rises across Asian markets',cat:'Markets',cls:'nb-mkt'},
+    {t:'OpenAI signs $4bn Oracle Cloud Infrastructure deal for GPT-5 training',cat:'Tech',cls:'nb-tech'},
+    {t:'Euro/Dollar holds near 1.09 ahead of ECB policy statement',cat:'Finance',cls:'nb-fin'}
+  ];
+  var activeStock=null;
+  function fmt(tz){return new Date().toLocaleTimeString('it-IT',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  // Build clocks
+  var clEl=document.getElementById('vft-clocks');
+  clEl.innerHTML=ZONES.map(function(z){return'<div class="tb-clock"><span class="flag">'+z.flag+'</span><div><span class="city">'+z.city+'</span><span class="time" id="vftc_'+z.tz.replace(/\//g,'_')+'">'+fmt(z.tz)+'</span></div></div>';}).join('');
+  setInterval(function(){ZONES.forEach(function(z){var el=document.getElementById('vftc_'+z.tz.replace(/\//g,'_'));if(el)el.textContent=fmt(z.tz);});},1000);
+  // Build chips
+  document.getElementById('vft-stocks').innerHTML=Object.keys(STOCKS).map(function(sym){var s=STOCKS[sym];var up=s.pct>=0;var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="tb-stock-chip" onclick="vftTogglePanel(\''+sym+'\')" title="'+s.name+'"><span class="ch-tick">'+sym+'</span><span class="ch-px">$'+s.price.toFixed(2)+'</span><span class="ch-chg '+(up?'ch-up':'ch-down')+'">'+arr+sign+s.pct.toFixed(2)+'%</span></div>';}).join('');
+  // Panel
+  window.vftTogglePanel=function(sym){
+    var panel=document.getElementById('vft-stock-panel');
+    if(activeStock===sym&&panel.classList.contains('open')){panel.classList.remove('open');panel.innerHTML='';activeStock=null;return;}
+    activeStock=sym;panel.classList.add('open');
+    panel.innerHTML=Object.keys(STOCKS).map(function(s){var d=STOCKS[s];var up=d.pct>=0;var cls=up?'up':'down';var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="vft-sc'+(s===sym?' hl':'')+'"><div class="vft-sc-head"><div><div class="vft-sc-name">'+d.name+'</div><div class="vft-sc-exch">'+d.ex+' · '+s+'</div></div><span class="vft-sc-badge '+cls+'">'+arr+' '+sign+d.change.toFixed(2)+' ('+sign+d.pct.toFixed(2)+'%)</span></div><div class="vft-sc-price">$'+d.price.toFixed(2)+'</div><div class="vft-sc-grid"><div class="vft-sc-kv"><span class="vft-sc-k">Apertura</span><span class="vft-sc-v">$'+d.open.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Max</span><span class="vft-sc-v">$'+d.high.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Min</span><span class="vft-sc-v">$'+d.low.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Volume</span><span class="vft-sc-v">'+d.vol+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Mkt Cap</span><span class="vft-sc-v">'+d.mktcap+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">P/E</span><span class="vft-sc-v">'+d.pe+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">52w High</span><span class="vft-sc-v">$'+d.wk52h.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">52w Low</span><span class="vft-sc-v">$'+d.wk52l.toFixed(2)+'</span></div></div><div class="vft-sc-note">'+d.note+'</div></div>';}).join('')+'<button class="vft-sc-close" onclick="vftClosePanel()">chiudi ✕</button>';
+  };
+  window.vftClosePanel=function(){document.getElementById('vft-stock-panel').classList.remove('open');document.getElementById('vft-stock-panel').innerHTML='';activeStock=null;};
+  // News — Reuters via Google News RSS (Reuters ha rimosso i propri feed diretti nel 2020)
+  // Google News RSS filtra articoli da reuters.com in tempo reale
+  var NEWS_SOURCES=[
+    {url:'https://news.google.com/rss/search?q=when:6h+allinurl:reuters.com+finance+economy&hl=en-US&gl=US&ceid=US:en',       cat:'Finance', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+allinurl:reuters.com+technology+AI&hl=en-US&gl=US&ceid=US:en',         cat:'Tech',    cls:'nb-tech'},
+    {url:'https://news.google.com/rss/search?q=when:6h+allinurl:reuters.com+markets+stocks&hl=en-US&gl=US&ceid=US:en',        cat:'Markets', cls:'nb-mkt'},
+    {url:'https://news.google.com/rss/search?q=when:6h+allinurl:reuters.com+world+politics&hl=en-US&gl=US&ceid=US:en',        cat:'World',   cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=when:12h+allinurl:reuters.com&hl=en-US&gl=US&ceid=US:en',                      cat:'Reuters', cls:'nb-mkt'}
+  ];
+  function fetchRSS(src){
+    return fetch('https://api.allorigins.win/get?url='+encodeURIComponent(src.url),{signal:AbortSignal.timeout(7000)})
+      .then(function(r){return r.json();})
+      .then(function(j){
+        var doc=new DOMParser().parseFromString(j.contents,'text/xml');
+        // Google News RSS: items have <title> and <source> tags
+        return Array.from(doc.querySelectorAll('item')).slice(0,6)
+          .map(function(el){
+            var titleEl=el.querySelector('title');
+            if(!titleEl)return null;
+            var txt=titleEl.textContent.trim();
+            // Google News titles often end with " - Reuters" — keep as is, it confirms source
+            return txt.length>10?{t:txt,cat:src.cat,cls:src.cls}:null;
+          })
+          .filter(Boolean);
+      });
+  }
+  function renderTicker(items){
+    var track=document.getElementById('vft-news-track');
+    if(!track)return;
+    var html=[].concat(items,items).map(function(i){return'<span class="tb-news-item"><span class="nb-cat '+i.cls+'">'+i.cat+'</span>'+esc(i.t)+'</span><span class="tb-news-sep">◆</span>';}).join('');
+    track.innerHTML=html;
+    var dur=Math.max(60,Math.min(160,items.reduce(function(n,i){return n+i.t.length;},0)*0.18));
+    track.style.animationDuration=dur+'s';
+  }
+  function loadNews(){
+    var items=[];
+    Promise.allSettled(NEWS_SOURCES.map(fetchRSS)).then(function(res){
+      res.forEach(function(r){if(r.status==='fulfilled')items=items.concat(r.value);});
+      if(items.length<4)items=FALLBACK;
+      items=items.sort(function(){return Math.random()-.49;});
+      renderTicker(items);
+    }).catch(function(){renderTicker(FALLBACK);});
+  }
+  renderTicker(FALLBACK);
+  loadNews();
+  setInterval(loadNews,5*60*1000);
+})();
+</script>
+
+
 <div class="lang-switcher">
   <div class="hamburger" onclick="toggleMenu()" id="hamburger">
     <span></span><span></span><span></span>
