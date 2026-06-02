@@ -220,7 +220,7 @@
   .tb-news-wrap::before { content:''; position:absolute; left:0; top:0; bottom:0; width:28px; background:linear-gradient(to right,#0D1B2A,transparent); z-index:2; pointer-events:none; }
   .tb-news-label { font-size:9px; font-weight:700; color:#FF8000; letter-spacing:.8px; text-transform:uppercase; background:rgba(255,128,0,.14); border:.5px solid rgba(255,128,0,.35); border-radius:3px; padding:2px 6px; flex-shrink:0; margin-right:8px; z-index:3; }
   .tb-news-inner { flex:1; overflow:hidden; min-width:0; }
-  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 100s linear infinite; }
+  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 75s linear infinite; }
   .tb-news-track:hover { animation-play-state:paused; }
   @keyframes tbNewsScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
   .tb-news-item { display:inline-flex; align-items:center; gap:5px; padding:0 22px 0 0; font-size:11.5px; color:#C8D8F0; }
@@ -273,12 +273,8 @@
       gap: 0;
       min-width: max-content;
     }
-    @keyframes tbBarScroll {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
     .tb-div { margin:0 6px; }
-    /* Su mobile la news track non si anima autonomamente — scorre col wrapper */
+    /* Su mobile la news track non si anima — tutto scorre col wrapper JS */
     .tb-news-track { animation:none !important; }
     .tb-news-wrap { flex:none; overflow:visible; }
     .tb-news-wrap::before { display:none; }
@@ -350,18 +346,16 @@
   },1000);
   // Build chips
   document.getElementById('vft-stocks').innerHTML=Object.keys(STOCKS).map(function(sym){var s=STOCKS[sym];var up=s.pct>=0;var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="tb-stock-chip" onclick="vftTogglePanel(\''+sym+'\')" title="'+s.name+'"><span class="ch-tick">'+sym+'</span><span class="ch-px">$'+s.price.toFixed(2)+'</span><span class="ch-chg '+(up?'ch-up':'ch-down')+'">'+arr+sign+s.pct.toFixed(2)+'%</span></div>';}).join('');
-  // On mobile: duplicate inner content for seamless CSS loop
+  // On mobile: JS infinite scroll using requestAnimationFrame (no CSS animation conflicts)
   (function(){
     if(window.innerWidth>768)return;
     var topbar=document.getElementById('vft-topbar');
     var inner=document.getElementById('vft-topbar-inner');
     if(!topbar||!inner)return;
 
-    // On mobile: news track should show only ONE set of items (not doubled)
-    // because the outer wrapper handles the looping
+    // Remove duplicate half from news track (was doubled for desktop CSS loop)
     var track=document.getElementById('vft-news-track');
     if(track){
-      // Remove the duplicate half that was added for the CSS loop
       var items=track.querySelectorAll('.tb-news-item, .tb-news-sep');
       var total=items.length;
       var half=Math.floor(total/2);
@@ -370,26 +364,40 @@
       }
     }
 
-    // Create wrapper that holds original + clone
+    // Build scroll wrapper: [copy A][copy B] — when copy A exits left, jump back to start
     var wrap=document.createElement('div');
     wrap.id='vft-topbar-scroll';
-    wrap.style.cssText='display:flex;align-items:center;gap:0;animation:tbBarScroll 130s linear infinite;white-space:nowrap;';
-    // Move original inner into wrapper
+    wrap.style.cssText='display:flex;align-items:center;gap:0;will-change:transform;';
     topbar.removeChild(inner);
     wrap.appendChild(inner);
-    // Clone inner, remap IDs with c2_ prefix
+
+    // Clone inner (copy B), remap IDs
     var clone=inner.cloneNode(true);
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach(function(el){
       el.setAttribute('id','c2_'+el.getAttribute('id'));
     });
-    // Sync clone clocks immediately
     ZONES.forEach(function(z){
       var el=clone.querySelector('#c2_vftc_'+z.tz.replace(/\//g,'_'));
       if(el)el.textContent=fmt(z.tz);
     });
     wrap.appendChild(clone);
     topbar.appendChild(wrap);
+
+    // rAF scroll: 1px per ~8ms = ~120px/s → full loop ~screen-width*2 seconds
+    var pos=0;
+    var speed=0.020; // px per ms — ~130s per ciclo
+    var last=null;
+    function step(ts){
+      if(last===null)last=ts;
+      var dt=ts-last; last=ts;
+      pos+=speed*dt;
+      var halfW=inner.offsetWidth;
+      if(halfW>0 && pos>=halfW) pos=pos-halfW; // seamless jump
+      wrap.style.transform='translateX(-'+pos+'px)';
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   })();
   // Panel
   window.vftTogglePanel=function(sym){
