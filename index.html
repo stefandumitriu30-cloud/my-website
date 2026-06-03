@@ -348,69 +348,14 @@
   },1000);
   // Build chips
   document.getElementById('vft-stocks').innerHTML=Object.keys(STOCKS).map(function(sym){var s=STOCKS[sym];var up=s.pct>=0;var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="tb-stock-chip" onclick="vftTogglePanel(\''+sym+'\')" title="'+s.name+'"><span class="ch-tick">'+sym+'</span><span class="ch-px">$'+s.price.toFixed(2)+'</span><span class="ch-chg '+(up?'ch-up':'ch-down')+'">'+arr+sign+s.pct.toFixed(2)+'%</span></div>';}).join('');
-  // ── MOBILE TOPBAR SCROLL ──
-  // Su mobile scorre TUTTO #vft-topbar-inner (clocks + LIVE NEWS + news + stocks)
-  // Il news track su mobile è statico nel DOM — aggiornato dal motore news come su desktop
+// ── MOBILE TOPBAR SCROLL ──
+  // Scorre #vft-topbar-inner con rAF — nessun clone, nessun removeChild
   (function(){
     if(window.innerWidth > 768) return;
 
-    var topbar = document.getElementById('vft-topbar');
-    var inner  = document.getElementById('vft-topbar-inner');
-    if(!topbar || !inner) return;
+    var inner = document.getElementById('vft-topbar-inner');
+    if(!inner) return;
 
-    // Costruiamo [inner clone A] + [inner clone B] dentro un wrapper scorrevole
-    // così il loop è seamless (quando A esce a sx, B entra da dx)
-    var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;align-items:center;will-change:transform;';
-    wrapper.id = 'vft-mob-scroll';
-
-    // Sposta inner nel wrapper
-    topbar.removeChild(inner);
-    var clone = inner.cloneNode(true);
-    clone.removeAttribute('id');
-
-    // Rinomina gli ID nel clone per evitare duplicati (clocks, stocks)
-    clone.querySelectorAll('[id]').forEach(function(el){
-      el.setAttribute('id','mob2_'+el.getAttribute('id'));
-    });
-
-    // Aggiorna gli orologi nel clone
-    ZONES.forEach(function(z){
-      var el = clone.querySelector('#mob2_vftc_'+z.tz.replace(/\//g,'_'));
-      if(el) el.textContent = fmt(z.tz);
-    });
-
-    wrapper.appendChild(inner);
-    wrapper.appendChild(clone);
-    topbar.appendChild(wrapper);
-
-    // Aggiorna orologi nel clone ogni secondo
-    setInterval(function(){
-      ZONES.forEach(function(z){
-        var el = clone.querySelector('#mob2_vftc_'+z.tz.replace(/\//g,'_'));
-        if(el) el.textContent = fmt(z.tz);
-      });
-    }, 1000);
-
-    // Sincronizza il news track del clone con quello originale
-    // ogni volta che il motore aggiorna il DOM
-    var origTrack  = document.getElementById('vft-news-track');
-    var cloneTrack = clone.querySelector('.tb-news-track');
-    var _lastHTML  = '';
-    function syncCloneNews(){
-      if(!origTrack || !cloneTrack) return;
-      // Il motore news aggiorna origTrack con translateX — su mobile usiamo testo flat
-      // Prendiamo l'innerHTML e lo mettiamo nel clone senza transform
-      if(origTrack.innerHTML !== _lastHTML){
-        _lastHTML = origTrack.innerHTML;
-        cloneTrack.innerHTML = origTrack.innerHTML;
-        cloneTrack.style.transform = 'none';
-      }
-    }
-    setInterval(syncCloneNews, 2000);
-    syncCloneNews();
-
-    // rAF scroll: fa scorrere il wrapper a 60px/s (più lento di desktop — più leggibile)
     var pos  = 0;
     var last = null;
     var MSPEED = 60; // px/s
@@ -419,10 +364,12 @@
       if(last === null) last = ts;
       var dt = Math.min(ts - last, 50);
       last = ts;
-      pos += MSPEED * (dt/1000);
-      var halfW = inner.offsetWidth;
-      if(halfW > 0 && pos >= halfW) pos -= halfW;
-      wrapper.style.transform = 'translateX(-'+pos.toFixed(2)+'px)';
+      var w = inner.scrollWidth;
+      if(w > 0){
+        pos += MSPEED * (dt / 1000);
+        if(pos >= w) pos = 0;
+        inner.style.transform = 'translateX(-' + pos.toFixed(1) + 'px)';
+      }
       requestAnimationFrame(mobileStep);
     }
     requestAnimationFrame(mobileStep);
@@ -709,85 +656,7 @@
     SRC_BLOOMBERG.forEach(function(url,i){setTimeout(function(){fetchFeed(url,_proxyEN,function(items,p){_proxyEN=p;var a=addToBuffer(items,_newsEN,_seenEN,'Bloomberg','nb-fin');if(a>0){_tickerDirty=true;lsSave();}},function(){});},i*500);});
     SRC_SOLE.forEach(function(url,i){setTimeout(function(){fetchFeed(url,_proxyIT,function(items,p){_proxyIT=p;var a=addToBuffer(items,_newsIT,_seenIT,'Sole 24 Ore','nb-mkt');if(a>0){_tickerDirty=true;lsSave();}},function(){});},i*500+250);});
   },4*60*1000);
-  // ── MOBILE TOPBAR SCROLL ──
-  // Su mobile scorre TUTTO #vft-topbar-inner (clocks + LIVE NEWS + news + stocks)
-  // Il news track su mobile è statico nel DOM — aggiornato dal motore news come su desktop
-  (function(){
-    if(window.innerWidth > 768) return;
 
-    var topbar = document.getElementById('vft-topbar');
-    var inner  = document.getElementById('vft-topbar-inner');
-    if(!topbar || !inner) return;
-
-    // Costruiamo [inner clone A] + [inner clone B] dentro un wrapper scorrevole
-    // così il loop è seamless (quando A esce a sx, B entra da dx)
-    var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;align-items:center;will-change:transform;';
-    wrapper.id = 'vft-mob-scroll';
-
-    // Sposta inner nel wrapper
-    topbar.removeChild(inner);
-    var clone = inner.cloneNode(true);
-    clone.removeAttribute('id');
-
-    // Rinomina gli ID nel clone per evitare duplicati (clocks, stocks)
-    clone.querySelectorAll('[id]').forEach(function(el){
-      el.setAttribute('id','mob2_'+el.getAttribute('id'));
-    });
-
-    // Aggiorna gli orologi nel clone
-    ZONES.forEach(function(z){
-      var el = clone.querySelector('#mob2_vftc_'+z.tz.replace(/\//g,'_'));
-      if(el) el.textContent = fmt(z.tz);
-    });
-
-    wrapper.appendChild(inner);
-    wrapper.appendChild(clone);
-    topbar.appendChild(wrapper);
-
-    // Aggiorna orologi nel clone ogni secondo
-    setInterval(function(){
-      ZONES.forEach(function(z){
-        var el = clone.querySelector('#mob2_vftc_'+z.tz.replace(/\//g,'_'));
-        if(el) el.textContent = fmt(z.tz);
-      });
-    }, 1000);
-
-    // Sincronizza il news track del clone con quello originale
-    // ogni volta che il motore aggiorna il DOM
-    var origTrack  = document.getElementById('vft-news-track');
-    var cloneTrack = clone.querySelector('.tb-news-track');
-    var _lastHTML  = '';
-    function syncCloneNews(){
-      if(!origTrack || !cloneTrack) return;
-      // Il motore news aggiorna origTrack con translateX — su mobile usiamo testo flat
-      // Prendiamo l'innerHTML e lo mettiamo nel clone senza transform
-      if(origTrack.innerHTML !== _lastHTML){
-        _lastHTML = origTrack.innerHTML;
-        cloneTrack.innerHTML = origTrack.innerHTML;
-        cloneTrack.style.transform = 'none';
-      }
-    }
-    setInterval(syncCloneNews, 2000);
-    syncCloneNews();
-
-    // rAF scroll: fa scorrere il wrapper a 60px/s (più lento di desktop — più leggibile)
-    var pos  = 0;
-    var last = null;
-    var MSPEED = 60; // px/s
-
-    function mobileStep(ts){
-      if(last === null) last = ts;
-      var dt = Math.min(ts - last, 50);
-      last = ts;
-      pos += MSPEED * (dt/1000);
-      var halfW = inner.offsetWidth;
-      if(halfW > 0 && pos >= halfW) pos -= halfW;
-      wrapper.style.transform = 'translateX(-'+pos.toFixed(2)+'px)';
-      requestAnimationFrame(mobileStep);
-    }
-    requestAnimationFrame(mobileStep);
-  })();
   window.vftTogglePanel=function(sym){
     var panel=document.getElementById('vft-stock-panel');
     if(activeStock===sym&&panel.classList.contains('open')){panel.classList.remove('open');panel.innerHTML='';activeStock=null;return;}
