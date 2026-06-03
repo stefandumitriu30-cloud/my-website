@@ -382,183 +382,130 @@
   };
   window.vftClosePanel=function(){document.getElementById('vft-stock-panel').classList.remove('open');document.getElementById('vft-stock-panel').innerHTML='';activeStock=null;};
   // ══════════════════════════════════════════════════════════════════
-  // LIVE NEWS ENGINE — Bloomberg (EN) + Il Sole 24 Ore (IT)
-  // localStorage persistence + 4 proxy cascade + pattern 2EN+2IT
+  // LIVE NEWS ENGINE — Claude API con web_search
+  // Notizie fresche da Bloomberg e Il Sole 24 Ore ad ogni apertura
   // ══════════════════════════════════════════════════════════════════
 
-  var LS_KEY_EN = 'vft_news_en_v3';
-  var LS_KEY_IT = 'vft_news_it_v3';
-  var LS_KEY_SEEN_EN = 'vft_seen_en_v3';
-  var LS_KEY_SEEN_IT = 'vft_seen_it_v3';
-  var LS_KEY_TS = 'vft_news_ts_v3';
+  var LS_KEY_EN   = 'vft_news_en_v4';
+  var LS_KEY_IT   = 'vft_news_it_v4';
+  var LS_KEY_SEEN = 'vft_seen_v4';
+  var LS_KEY_TS   = 'vft_news_ts_v4';
 
-  // 12 query Bloomberg
-  var SRC_BLOOMBERG = [
-    'https://news.google.com/rss/search?q=site:bloomberg.com+markets&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+finance&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+economy&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+technology&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+politics&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+energy&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+stocks&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+Fed+rates&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+earnings&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+AI&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+commodities&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+bonds&hl=en-US&gl=US&ceid=US:en'
-  ];
-
-  // 12 query Il Sole 24 Ore
-  var SRC_SOLE = [
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+economia&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+finanza&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+mercati&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+tecnologia&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+imprese&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+mondo&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+politica&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+borse&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+lavoro&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+energia&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+notizie&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+aggiornamenti&hl=it&gl=IT&ceid=IT:it'
-  ];
-
-  // Buffers runtime
+  // Buffer runtime
   var _newsEN = [];
   var _newsIT = [];
-  var _seenEN = new Set();
-  var _seenIT = new Set();
-  var _idxEN  = 0;
-  var _idxIT  = 0;
+  var _seenKeys = new Set();
   var _tickerDirty = false;
+  var _fetchingEN = false;
+  var _fetchingIT = false;
 
-  // ── localStorage: salva/carica notizie tra sessioni ──
+  // ── localStorage ──
   function lsSave(){
-    try {
-      localStorage.setItem(LS_KEY_EN, JSON.stringify(_newsEN.slice(0,80)));
-      localStorage.setItem(LS_KEY_IT, JSON.stringify(_newsIT.slice(0,80)));
-      localStorage.setItem(LS_KEY_SEEN_EN, JSON.stringify(Array.from(_seenEN).slice(0,300)));
-      localStorage.setItem(LS_KEY_SEEN_IT, JSON.stringify(Array.from(_seenIT).slice(0,300)));
-      localStorage.setItem(LS_KEY_TS, Date.now().toString());
-    } catch(e){}
+    try{
+      localStorage.setItem(LS_KEY_EN, JSON.stringify(_newsEN.slice(0,60)));
+      localStorage.setItem(LS_KEY_IT, JSON.stringify(_newsIT.slice(0,60)));
+      localStorage.setItem(LS_KEY_SEEN, JSON.stringify([].concat(Array.from(_seenKeys)).slice(0,400)));
+      localStorage.setItem(LS_KEY_TS, ''+Date.now());
+    }catch(e){}
   }
 
   function lsLoad(){
-    try {
+    try{
       var ts = parseInt(localStorage.getItem(LS_KEY_TS)||'0',10);
-      var age = Date.now() - ts;
-      // Scarta se più vecchio di 2 ore
-      if(age > 2*60*60*1000) { lsClear(); return false; }
-      var en = JSON.parse(localStorage.getItem(LS_KEY_EN)||'null');
-      var it = JSON.parse(localStorage.getItem(LS_KEY_IT)||'null');
-      var seenEN = JSON.parse(localStorage.getItem(LS_KEY_SEEN_EN)||'null');
-      var seenIT = JSON.parse(localStorage.getItem(LS_KEY_SEEN_IT)||'null');
+      if(Date.now()-ts > 60*60*1000) return false; // scade dopo 1 ora
+      var en   = JSON.parse(localStorage.getItem(LS_KEY_EN)||'null');
+      var it   = JSON.parse(localStorage.getItem(LS_KEY_IT)||'null');
+      var seen = JSON.parse(localStorage.getItem(LS_KEY_SEEN)||'[]');
       if(!en||!it||!en.length||!it.length) return false;
-      _newsEN = en;
-      _newsIT = it;
-      _seenEN = new Set(seenEN||[]);
-      _seenIT = new Set(seenIT||[]);
+      _newsEN   = en;
+      _newsIT   = it;
+      _seenKeys = new Set(seen);
       return true;
-    } catch(e){ return false; }
+    }catch(e){ return false; }
   }
 
-  function lsClear(){
-    try {
-      [LS_KEY_EN,LS_KEY_IT,LS_KEY_SEEN_EN,LS_KEY_SEEN_IT,LS_KEY_TS].forEach(function(k){
-        localStorage.removeItem(k);
-      });
-    } catch(e){}
+  // ── Claude API: chiama claude-haiku con web_search per ottenere notizie fresche ──
+  function fetchNewsViaClaude(query, lang, onDone){
+    var sysPrompt = lang === 'it'
+      ? 'Sei un assistente che recupera notizie. Rispondi SOLO con JSON valido, nessun testo extra, nessun markdown. Formato: {"items":[{"t":"titolo notizia","ts":1234567890},...]}'
+      : 'You are a news assistant. Reply ONLY with valid JSON, no extra text, no markdown. Format: {"items":[{"t":"headline text","ts":1234567890},...]}';
+
+    var userMsg = lang === 'it'
+      ? 'Cerca le ultime 10 notizie di oggi da ilsole24ore.com su economia, finanza e mercati italiani. Rispondi solo con il JSON richiesto, con i timestamp Unix in ms.'
+      : 'Search for the latest 10 headlines from bloomberg.com today about markets, finance, and economy. Reply only with the requested JSON, with Unix timestamps in ms.';
+
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'anthropic-beta': 'interactivity-2025-02-13' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        system: sysPrompt,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      // Estrae il testo dalla risposta (potrebbe avere più content blocks)
+      var text = (data.content||[])
+        .filter(function(b){ return b.type==='text'; })
+        .map(function(b){ return b.text||''; })
+        .join('');
+      // Pulisce e parsa il JSON
+      var clean = text.replace(/```json|```/g,'').trim();
+      // Trova il primo { e l'ultimo }
+      var first = clean.indexOf('{');
+      var last  = clean.lastIndexOf('}');
+      if(first===-1||last===-1) throw new Error('no JSON');
+      var parsed = JSON.parse(clean.slice(first, last+1));
+      onDone(parsed.items||[]);
+    })
+    .catch(function(e){ console.warn('Claude API news fetch failed:', e); onDone([]); });
   }
 
-  // 4 proxy in cascata
-  var PROXIES = [
-    function(url){ return 'https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url)+'&count=20'; },
-    function(url){ return 'https://api.allorigins.win/get?url='+encodeURIComponent(url); },
-    function(url){ return 'https://corsproxy.io/?'+encodeURIComponent(url); },
-    function(url){ return 'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url); }
-  ];
-  var _proxyEN = 0;
-  var _proxyIT = 0;
-
-  function cleanTitle(raw){
-    return (raw||'')
-      .replace(/<!\[CDATA\[|\]\]>/g,'')
-      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-      .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&apos;/g,"'")
-      .replace(/\s*[-–|]\s*(Bloomberg|Il Sole 24 Ore|Reuters|CNN|AP|CNBC|WSJ|FT)\s*$/i,'')
-      .trim();
-  }
-
-  function parseResponse(j){
-    if(j && j.items && Array.isArray(j.items)){
-      return j.items.map(function(it){
-        var t=cleanTitle(it.title);
-        return t.length>20?{t:t,ts:it.pubDate?new Date(it.pubDate).getTime():Date.now()}:null;
-      }).filter(Boolean);
-    }
-    var raw=j.contents||j.body||(typeof j==='string'?j:'');
-    if(!raw||raw.length<100) return null;
-    var doc=new DOMParser().parseFromString(raw,'text/xml');
-    if(doc.querySelector('parsererror')) return null;
-    return Array.from(doc.querySelectorAll('item')).slice(0,20).map(function(el){
-      var t=cleanTitle((el.querySelector('title')||{}).textContent||'');
-      var pd=el.querySelector('pubDate');
-      var ts=pd?new Date(pd.textContent).getTime():Date.now();
-      return t.length>20?{t:t,ts:ts}:null;
-    }).filter(Boolean);
-  }
-
-  function fetchFeed(url, proxyStart, onSuccess, onFail){
-    var tried=0;
-    function attempt(pi){
-      if(tried>=PROXIES.length){onFail();return;}
-      tried++;
-      fetch(PROXIES[pi%PROXIES.length](url),{signal:AbortSignal.timeout(9000)})
-        .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-        .then(function(j){
-          var items=parseResponse(j);
-          if(!items||!items.length)throw new Error('empty');
-          onSuccess(items,pi%PROXIES.length);
-        })
-        .catch(function(){attempt((pi+1)%PROXIES.length);});
-    }
-    attempt(proxyStart);
-  }
-
-  function addToBuffer(items,buf,seen,cat,cls){
-    var added=0;
-    items.sort(function(a,b){return b.ts-a.ts;});
-    items.forEach(function(item){
-      var key=item.t.slice(0,55).toLowerCase();
-      if(!seen.has(key)){
-        seen.add(key);
-        buf.unshift({t:item.t,cat:cat,cls:cls,ts:item.ts});
+  function addItems(items, buf, cat, cls){
+    var added = 0;
+    (items||[]).sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+    (items||[]).forEach(function(item){
+      if(!item||!item.t||item.t.length<20) return;
+      var key = item.t.slice(0,55).toLowerCase();
+      if(!_seenKeys.has(key)){
+        _seenKeys.add(key);
+        buf.unshift({t:item.t, cat:cat, cls:cls, ts:item.ts||Date.now()});
         added++;
       }
     });
-    if(buf.length>100)buf.splice(100);
+    if(buf.length>80) buf.splice(80);
     return added;
   }
 
+  function flashNewsBadge(){
+    var label=document.querySelector('.tb-news-label');
+    if(!label)return;
+    label.style.transition='background 0.3s';
+    label.style.background='rgba(255,128,0,0.55)';
+    setTimeout(function(){label.style.background='';},900);
+  }
+
   function fetchEN(){
-    var url=SRC_BLOOMBERG[_idxEN%SRC_BLOOMBERG.length];
-    _idxEN++;
-    fetchFeed(url,_proxyEN,function(items,p){
-      _proxyEN=p;
-      var added=addToBuffer(items,_newsEN,_seenEN,'Bloomberg','nb-fin');
-      if(added>0){_tickerDirty=true;flashNewsBadge();lsSave();}
-    },function(){_proxyEN=(_proxyEN+1)%PROXIES.length;});
+    if(_fetchingEN) return;
+    _fetchingEN = true;
+    fetchNewsViaClaude('bloomberg markets finance', 'en', function(items){
+      _fetchingEN = false;
+      var added = addItems(items, _newsEN, 'Bloomberg', 'nb-fin');
+      if(added>0){ _tickerDirty=true; flashNewsBadge(); lsSave(); }
+    });
   }
 
   function fetchIT(){
-    var url=SRC_SOLE[_idxIT%SRC_SOLE.length];
-    _idxIT++;
-    fetchFeed(url,_proxyIT,function(items,p){
-      _proxyIT=p;
-      var added=addToBuffer(items,_newsIT,_seenIT,'Sole 24 Ore','nb-mkt');
-      if(added>0){_tickerDirty=true;flashNewsBadge();lsSave();}
-    },function(){_proxyIT=(_proxyIT+1)%PROXIES.length;});
+    if(_fetchingIT) return;
+    _fetchingIT = true;
+    fetchNewsViaClaude('il sole 24 ore economia finanza', 'it', function(items){
+      _fetchingIT = false;
+      var added = addItems(items, _newsIT, 'Sole 24 Ore', 'nb-mkt');
+      if(added>0){ _tickerDirty=true; flashNewsBadge(); lsSave(); }
+    });
   }
 
   // ── TICKER rAF ENGINE ──
@@ -567,265 +514,11 @@
   var _SPEED      = 80;
 
   function buildInterleavedPool(){
-    var en=_newsEN.length?_newsEN:FALLBACK.filter(function(i){return i.cat==='Bloomberg';});
-    var it=_newsIT.length?_newsIT:FALLBACK.filter(function(i){return i.cat==='Sole 24 Ore';});
-    var pool=[],ei=0,ii=0;
-    var maxP=Math.max(en.length,it.length);
-    for(var p=0;p<maxP;p++){
-      for(var j=0;j<2;j++){if(ei<en.length)pool.push(en[ei++]);}
-      for(var k=0;k<2;k++){if(ii<it.length)pool.push(it[ii++]);}
-    }
-    return pool.slice(0,80);
-  }
-
-  function buildTrackHTML(pool){
-    return [].concat(pool,pool).map(function(i){
-      return '<span class="tb-news-item"><span class="nb-cat '+i.cls+'">'+i.cat+'</span>'+esc(i.t)+'</span><span class="tb-news-sep">◆</span>';
-    }).join('');
-  }
-
-  function refreshTrack(){
-    var track=document.getElementById('vft-news-track');
-    if(!track)return;
-    var pool=buildInterleavedPool();
-    var newHTML=buildTrackHTML(pool);
-    if(track.innerHTML===newHTML)return;
-    var halfW=track.scrollWidth/2||1;
-    track.innerHTML=newHTML;
-    var newHalfW=track.scrollWidth/2||1;
-    _tickerPos=(_tickerPos/halfW)*newHalfW;
-    _tickerDirty=false;
-  }
-
-  function initTicker(){
-    var track=document.getElementById('vft-news-track');
-    if(!track)return;
-    track.innerHTML=buildTrackHTML(buildInterleavedPool());
-    requestAnimationFrame(tickerStep);
-  }
-
-  function tickerStep(ts){
-    if(_tickerLast===null)_tickerLast=ts;
-    var dt=Math.min(ts-_tickerLast,50);
-    _tickerLast=ts;
-    var track=document.getElementById('vft-news-track');
-    if(track){
-      var halfW=track.scrollWidth/2;
-      if(halfW>0){
-        _tickerPos+=_SPEED*(dt/1000);
-        if(_tickerPos>=halfW)_tickerPos-=halfW;
-        track.style.transform='translateX(-'+_tickerPos.toFixed(2)+'px)';
-      }
-      if(_tickerDirty)refreshTrack();
-    }
-    requestAnimationFrame(tickerStep);
-  }
-
-  // ── BOOT ──
-  // 1. Carica subito da localStorage (notizie dalla sessione precedente)
-  var hadCached = lsLoad();
-  initTicker(); // mostra subito cached o fallback
-
-  // 2. Fetch immediato di tutti i feed (aggiorna con notizie fresche)
-  SRC_BLOOMBERG.forEach(function(url,i){
-    setTimeout(function(){
-      fetchFeed(url,_proxyEN,function(items,p){
-        _proxyEN=p;
-        var added=addToBuffer(items,_newsEN,_seenEN,'Bloomberg','nb-fin');
-        if(added>0){_tickerDirty=true;flashNewsBadge();lsSave();}
-      },function(){});
-    },i*400);
-  });
-  SRC_SOLE.forEach(function(url,i){
-    setTimeout(function(){
-      fetchFeed(url,_proxyIT,function(items,p){
-        _proxyIT=p;
-        var added=addToBuffer(items,_newsIT,_seenIT,'Sole 24 Ore','nb-mkt');
-        if(added>0){_tickerDirty=true;flashNewsBadge();lsSave();}
-      },function(){});
-    },i*400+200);
-  });
-
-  // 3. Ciclo continuo: EN ogni 20s, IT ogni 20s sfasati di 10s
-  setInterval(fetchEN,20*1000);
-  setInterval(function(){setTimeout(fetchIT,10*1000);},20*1000);
-
-  // 4. Full refresh ogni 4 minuti
-  setInterval(function(){
-    _idxEN=0;_idxIT=0;
-    SRC_BLOOMBERG.forEach(function(url,i){setTimeout(function(){fetchFeed(url,_proxyEN,function(items,p){_proxyEN=p;var a=addToBuffer(items,_newsEN,_seenEN,'Bloomberg','nb-fin');if(a>0){_tickerDirty=true;lsSave();}},function(){});},i*500);});
-    SRC_SOLE.forEach(function(url,i){setTimeout(function(){fetchFeed(url,_proxyIT,function(items,p){_proxyIT=p;var a=addToBuffer(items,_newsIT,_seenIT,'Sole 24 Ore','nb-mkt');if(a>0){_tickerDirty=true;lsSave();}},function(){});},i*500+250);});
-  },4*60*1000);
-
-  window.vftTogglePanel=function(sym){
-    var panel=document.getElementById('vft-stock-panel');
-    if(activeStock===sym&&panel.classList.contains('open')){panel.classList.remove('open');panel.innerHTML='';activeStock=null;return;}
-    activeStock=sym;panel.classList.add('open');
-    panel.innerHTML=Object.keys(STOCKS).map(function(s){var d=STOCKS[s];var up=d.pct>=0;var cls=up?'up':'down';var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="vft-sc'+(s===sym?' hl':'')+'"><div class="vft-sc-head"><div><div class="vft-sc-name">'+d.name+'</div><div class="vft-sc-exch">'+d.ex+' · '+s+'</div></div><span class="vft-sc-badge '+cls+'">'+arr+' '+sign+d.change.toFixed(2)+' ('+sign+d.pct.toFixed(2)+'%)</span></div><div class="vft-sc-price">$'+d.price.toFixed(2)+'</div><div class="vft-sc-grid"><div class="vft-sc-kv"><span class="vft-sc-k">Apertura</span><span class="vft-sc-v">$'+d.open.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Max</span><span class="vft-sc-v">$'+d.high.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Min</span><span class="vft-sc-v">$'+d.low.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Volume</span><span class="vft-sc-v">'+d.vol+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Mkt Cap</span><span class="vft-sc-v">'+d.mktcap+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">P/E</span><span class="vft-sc-v">'+d.pe+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">52w High</span><span class="vft-sc-v">$'+d.wk52h.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">52w Low</span><span class="vft-sc-v">$'+d.wk52l.toFixed(2)+'</span></div></div><div class="vft-sc-note">'+d.note+'</div></div>';}).join('')+'<button class="vft-sc-close" onclick="vftClosePanel()">chiudi ✕</button>';
-  };
-  window.vftClosePanel=function(){document.getElementById('vft-stock-panel').classList.remove('open');document.getElementById('vft-stock-panel').innerHTML='';activeStock=null;};
-  // ══════════════════════════════════════════════════════════════════
-  // LIVE NEWS ENGINE — Bloomberg + Il Sole 24 Ore, pattern 2+2
-  // Proxy cascade: rss2json (affidabile, no CORS) → allorigins → corsproxy
-  // ══════════════════════════════════════════════════════════════════
-
-  // ── 24 query Bloomberg (EN) — 6 argomenti × 4 varianti ──
-  var SRC_BLOOMBERG = [
-    'https://news.google.com/rss/search?q=site:bloomberg.com+markets&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+finance&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+economy&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+technology&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+politics&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+energy&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+stocks&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+bonds&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+Fed+rates&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+earnings&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+AI+tech&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=site:bloomberg.com+commodities&hl=en-US&gl=US&ceid=US:en'
-  ];
-
-  // ── 12 query Il Sole 24 Ore (IT) ──
-  var SRC_SOLE = [
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+economia&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+finanza&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+mercati&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+tecnologia&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+imprese&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+mondo&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+politica&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+borse&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+lavoro&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+energia&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+notizie&hl=it&gl=IT&ceid=IT:it',
-    'https://news.google.com/rss/search?q=site:ilsole24ore.com+aggiornamenti&hl=it&gl=IT&ceid=IT:it'
-  ];
-
-  // Buffer separati per fonte
-  var _newsEN = [];   // Bloomberg
-  var _newsIT = [];   // Sole 24 Ore
-  var _seenEN = new Set();
-  var _seenIT = new Set();
-  var _idxEN  = 0;
-  var _idxIT  = 0;
-  var _tickerDirty = false;
-
-  // 4 proxy con strategie diverse
-  var PROXIES = [
-    // rss2json — converte RSS in JSON, gestisce CORS nativamente
-    function(url){ return 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(url) + '&api_key=&count=20'; },
-    // allorigins
-    function(url){ return 'https://api.allorigins.win/get?url=' + encodeURIComponent(url); },
-    // corsproxy.io
-    function(url){ return 'https://corsproxy.io/?' + encodeURIComponent(url); },
-    // codetabs
-    function(url){ return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url); }
-  ];
-  var _proxyEN = 0;
-  var _proxyIT = 0;
-
-  function cleanTitle(raw){
-    return (raw||'')
-      .replace(/<!\[CDATA\[|\]\]>/g,'')
-      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-      .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&apos;/g,"'")
-      .replace(/\s*[-–|]\s*(Bloomberg|Il Sole 24 Ore|Reuters|CNN|AP|CNBC|WSJ|FT)\s*$/i,'')
-      .trim();
-  }
-
-  // Parse risposta dal proxy (gestisce sia rss2json che xml grezzo)
-  function parseProxyResponse(j, proxyIdx){
-    // rss2json restituisce {items:[{title,pubDate},...]}
-    if(j && j.items && Array.isArray(j.items)){
-      return j.items.map(function(it){
-        var t=cleanTitle(it.title);
-        return t.length>20 ? {t:t, ts: it.pubDate ? new Date(it.pubDate).getTime() : Date.now()} : null;
-      }).filter(Boolean);
-    }
-    // allorigins / codetabs restituiscono {contents: "...xml..."}
-    var raw = j.contents || j.body || (typeof j==='string'?j:'');
-    if(!raw || raw.length < 100) return null; // segnala fallimento
-    var doc = new DOMParser().parseFromString(raw,'text/xml');
-    if(doc.querySelector('parsererror')) return null;
-    return Array.from(doc.querySelectorAll('item')).slice(0,20).map(function(el){
-      var t = cleanTitle((el.querySelector('title')||{}).textContent||'');
-      var pd = el.querySelector('pubDate');
-      var ts = pd ? new Date(pd.textContent).getTime() : Date.now();
-      return t.length>20 ? {t:t,ts:ts} : null;
-    }).filter(Boolean);
-  }
-
-  // Fetch con fallback proxy automatico
-  function fetchFeed(url, proxyIdxRef, onSuccess, onFail){
-    var tried = 0;
-    function attempt(pi){
-      if(tried >= PROXIES.length){ onFail(); return; }
-      tried++;
-      var fetchUrl = PROXIES[pi % PROXIES.length](url);
-      fetch(fetchUrl, {signal: AbortSignal.timeout(9000)})
-        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-        .then(function(j){
-          var items = parseProxyResponse(j, pi % PROXIES.length);
-          if(!items || items.length === 0) throw new Error('empty');
-          onSuccess(items, pi % PROXIES.length);
-        })
-        .catch(function(){ attempt((pi+1) % PROXIES.length); });
-    }
-    attempt(proxyIdxRef);
-  }
-
-  function addToBuffer(items, buf, seen, cat, cls){
-    var added = 0;
-    items.sort(function(a,b){return b.ts-a.ts;});
-    items.forEach(function(item){
-      var key = item.t.slice(0,55).toLowerCase();
-      if(!seen.has(key)){
-        seen.add(key);
-        buf.unshift({t:item.t, cat:cat, cls:cls, ts:item.ts});
-        added++;
-      }
-    });
-    if(buf.length > 100) buf.splice(100);
-    return added;
-  }
-
-  // Fetch un feed Bloomberg
-  function fetchEN(){
-    var url = SRC_BLOOMBERG[_idxEN % SRC_BLOOMBERG.length];
-    _idxEN++;
-    fetchFeed(url, _proxyEN, function(items, usedProxy){
-      _proxyEN = usedProxy;
-      var added = addToBuffer(items, _newsEN, _seenEN, 'Bloomberg', 'nb-fin');
-      if(added > 0){ _tickerDirty = true; flashNewsBadge(); }
-    }, function(){
-      _proxyEN = (_proxyEN+1) % PROXIES.length;
-    });
-  }
-
-  // Fetch un feed Il Sole 24 Ore
-  function fetchIT(){
-    var url = SRC_SOLE[_idxIT % SRC_SOLE.length];
-    _idxIT++;
-    fetchFeed(url, _proxyIT, function(items, usedProxy){
-      _proxyIT = usedProxy;
-      var added = addToBuffer(items, _newsIT, _seenIT, 'Sole 24 Ore', 'nb-mkt');
-      if(added > 0){ _tickerDirty = true; flashNewsBadge(); }
-    }, function(){
-      _proxyIT = (_proxyIT+1) % PROXIES.length;
-    });
-  }
-
-  // ── TICKER rAF ENGINE ──
-  var _tickerPos  = 0;
-  var _tickerLast = null;
-  var _SPEED      = 80; // px/s
-
-  function buildInterleavedPool(){
     var en = _newsEN.length ? _newsEN : FALLBACK.filter(function(i){return i.cat==='Bloomberg';});
     var it = _newsIT.length ? _newsIT : FALLBACK.filter(function(i){return i.cat==='Sole 24 Ore';});
-    var pool=[], ei=0, ii=0;
-    var maxP = Math.max(en.length, it.length);
-    for(var p=0; p<maxP; p++){
+    var pool=[],ei=0,ii=0;
+    var max=Math.max(en.length,it.length);
+    for(var p=0;p<max;p++){
       for(var j=0;j<2;j++){ if(ei<en.length) pool.push(en[ei++]); }
       for(var k=0;k<2;k++){ if(ii<it.length) pool.push(it[ii++]); }
     }
@@ -842,12 +535,12 @@
     var track = document.getElementById('vft-news-track');
     if(!track) return;
     var pool = buildInterleavedPool();
-    var newHTML = buildTrackHTML(pool);
-    if(track.innerHTML === newHTML) return;
-    var halfW = track.scrollWidth/2 || 1;
-    track.innerHTML = newHTML;
-    var newHalfW = track.scrollWidth/2 || 1;
-    _tickerPos = (_tickerPos/halfW)*newHalfW;
+    var html = buildTrackHTML(pool);
+    if(track.innerHTML===html) return;
+    var hw = track.scrollWidth/2||1;
+    track.innerHTML = html;
+    var nhw = track.scrollWidth/2||1;
+    _tickerPos = (_tickerPos/hw)*nhw;
     _tickerDirty = false;
   }
 
@@ -860,14 +553,14 @@
 
   function tickerStep(ts){
     if(_tickerLast===null) _tickerLast=ts;
-    var dt = Math.min(ts-_tickerLast, 50);
+    var dt = Math.min(ts-_tickerLast,50);
     _tickerLast = ts;
     var track = document.getElementById('vft-news-track');
     if(track){
-      var halfW = track.scrollWidth/2;
-      if(halfW>0){
+      var hw = track.scrollWidth/2;
+      if(hw>0){
         _tickerPos += _SPEED*(dt/1000);
-        if(_tickerPos >= halfW) _tickerPos -= halfW;
+        if(_tickerPos>=hw) _tickerPos-=hw;
         track.style.transform = 'translateX(-'+_tickerPos.toFixed(2)+'px)';
       }
       if(_tickerDirty) refreshTrack();
@@ -875,40 +568,20 @@
     requestAnimationFrame(tickerStep);
   }
 
-  // ── BOOT: carica subito tutti i feed in parallelo ──
-  initTicker();
+  // ── BOOT ──
+  lsLoad();       // carica notizie salvate (se fresche)
+  initTicker();   // mostra subito cached o fallback
 
-  // Prima ondata: tutti i feed EN e IT in parallelo
-  SRC_BLOOMBERG.forEach(function(url, i){
-    setTimeout(function(){
-      fetchFeed(url, _proxyEN, function(items, p){
-        _proxyEN=p;
-        var added=addToBuffer(items,_newsEN,_seenEN,'Bloomberg','nb-fin');
-        if(added>0){_tickerDirty=true; flashNewsBadge();}
-      }, function(){});
-    }, i*400);
-  });
-  SRC_SOLE.forEach(function(url, i){
-    setTimeout(function(){
-      fetchFeed(url, _proxyIT, function(items, p){
-        _proxyIT=p;
-        var added=addToBuffer(items,_newsIT,_seenIT,'Sole 24 Ore','nb-mkt');
-        if(added>0){_tickerDirty=true; flashNewsBadge();}
-      }, function(){});
-    }, i*400 + 200);
-  });
+  // Fetch notizie fresche via Claude API
+  fetchEN();
+  setTimeout(fetchIT, 2000);
 
-  // Ciclo continuo: EN e IT alternati ogni 20s
-  setInterval(fetchEN, 20*1000);
-  setInterval(function(){ setTimeout(fetchIT, 10*1000); }, 20*1000);
+  // Aggiorna ogni 10 minuti
+  setInterval(fetchEN, 10*60*1000);
+  setInterval(function(){ setTimeout(fetchIT, 2000); }, 10*60*1000);
 
-  // Full refresh ogni 4 minuti (tutti i feed)
-  setInterval(function(){
-    _idxEN=0; _idxIT=0;
-    SRC_BLOOMBERG.forEach(function(url,i){ setTimeout(function(){ fetchFeed(url,_proxyEN,function(items,p){_proxyEN=p;var a=addToBuffer(items,_newsEN,_seenEN,'Bloomberg','nb-fin');if(a>0){_tickerDirty=true;}},function(){}); }, i*500); });
-    SRC_SOLE.forEach(function(url,i){ setTimeout(function(){ fetchFeed(url,_proxyIT,function(items,p){_proxyIT=p;var a=addToBuffer(items,_newsIT,_seenIT,'Sole 24 Ore','nb-mkt');if(a>0){_tickerDirty=true;}},function(){}); }, i*500+250); });
-  }, 4*60*1000);
-})();</script>
+})();
+</script>
 
 
 
