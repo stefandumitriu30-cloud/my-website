@@ -624,6 +624,21 @@
     document.getElementById('btn-en').classList.toggle('active', lang === 'en');
     document.getElementById('btn-it').classList.toggle('active', lang === 'it');
   }
+
+  function toggleMenu() {
+    var links = document.getElementById('nav-links');
+    var ham   = document.getElementById('hamburger');
+    if (!links) return;
+    var open = links.classList.toggle('open');
+    if (ham) ham.classList.toggle('open', open);
+  }
+  function closeMenu() {
+    var links = document.getElementById('nav-links');
+    var ham   = document.getElementById('hamburger');
+    if (links) links.classList.remove('open');
+    if (ham)   ham.classList.remove('open');
+  }
+
   window.addEventListener('load', function(){ setLang(getCurrentLang()); });
 </script>
 </body>
