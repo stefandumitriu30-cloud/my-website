@@ -412,103 +412,174 @@
     panel.innerHTML=Object.keys(STOCKS).map(function(s){var d=STOCKS[s];var up=d.pct>=0;var cls=up?'up':'down';var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="vft-sc'+(s===sym?' hl':'')+'"><div class="vft-sc-head"><div><div class="vft-sc-name">'+d.name+'</div><div class="vft-sc-exch">'+d.ex+' · '+s+'</div></div><span class="vft-sc-badge '+cls+'">'+arr+' '+sign+d.change.toFixed(2)+' ('+sign+d.pct.toFixed(2)+'%)</span></div><div class="vft-sc-price">$'+d.price.toFixed(2)+'</div><div class="vft-sc-grid"><div class="vft-sc-kv"><span class="vft-sc-k">Apertura</span><span class="vft-sc-v">$'+d.open.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Max</span><span class="vft-sc-v">$'+d.high.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Min</span><span class="vft-sc-v">$'+d.low.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Volume</span><span class="vft-sc-v">'+d.vol+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">Mkt Cap</span><span class="vft-sc-v">'+d.mktcap+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">P/E</span><span class="vft-sc-v">'+d.pe+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">52w High</span><span class="vft-sc-v">$'+d.wk52h.toFixed(2)+'</span></div><div class="vft-sc-kv"><span class="vft-sc-k">52w Low</span><span class="vft-sc-v">$'+d.wk52l.toFixed(2)+'</span></div></div><div class="vft-sc-note">'+d.note+'</div></div>';}).join('')+'<button class="vft-sc-close" onclick="vftClosePanel()">chiudi ✕</button>';
   };
   window.vftClosePanel=function(){document.getElementById('vft-stock-panel').classList.remove('open');document.getElementById('vft-stock-panel').innerHTML='';activeStock=null;};
-  // ── NEWS REAL-TIME: Google News International RSS ──
-  // Feed Google News internazionali — si aggiornano continuamente ogni 90 secondi
+  // ══════════════════════════════════════════════════════════════════
+  // LIVE NEWS ENGINE — multi-source international, continuous refresh
+  // ══════════════════════════════════════════════════════════════════
+
+  // 20 fonti internazionali: Google News topics + search + lingue miste
   var NEWS_SOURCES=[
-    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US%3Aen',cat:'World',cls:'nb-world'},
-    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US%3Aen',cat:'World',cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=international+finance+markets&hl=en-US&gl=US&ceid=US:en',                        cat:'Finance',cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=global+economy+stocks+2026&hl=en-US&gl=US&ceid=US:en',                          cat:'Markets',cls:'nb-mkt'},
-    {url:'https://news.google.com/rss/search?q=technology+AI+cloud+enterprise&hl=en-US&gl=US&ceid=US:en',                      cat:'Tech',   cls:'nb-tech'},
-    {url:'https://news.google.com/rss/search?q=world+news+international+breaking&hl=en-US&gl=US&ceid=US:en',                   cat:'World',  cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=ERP+Oracle+SAP+enterprise+software&hl=en-US&gl=US&ceid=US:en',                  cat:'Tech',   cls:'nb-tech'},
-    {url:'https://news.google.com/rss/search?q=central+bank+interest+rates+inflation&hl=en-US&gl=US&ceid=US:en',               cat:'Finance',cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=notizie+internazionali+economia+finanza&hl=it&gl=IT&ceid=IT:it',                cat:'Mondo',  cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=mercati+finanziari+borsa+internazionale&hl=it&gl=IT&ceid=IT:it',                cat:'Mercati',cls:'nb-mkt'}
+    // ── Google News topic feeds (top headlines) ──
+    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'World',   cls:'nb-world'},
+    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTWtZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'Business',cls:'nb-fin'},
+    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNR1ptZHpRU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'Tech',    cls:'nb-tech'},
+    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNR05vYVRRU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'Science', cls:'nb-tech'},
+    // ── Google News search feeds — Finance & Markets ──
+    {url:'https://news.google.com/rss/search?q=global+finance+markets+economy+when:1d&hl=en-US&gl=US&ceid=US:en',                     cat:'Finance', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=stock+market+Wall+Street+S%26P+nasdaq+when:1d&hl=en-US&gl=US&ceid=US:en',             cat:'Markets', cls:'nb-mkt'},
+    {url:'https://news.google.com/rss/search?q=Federal+Reserve+ECB+interest+rates+inflation+when:1d&hl=en-US&gl=US&ceid=US:en',      cat:'Finance', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=oil+gold+commodities+energy+when:1d&hl=en-US&gl=US&ceid=US:en',                       cat:'Markets', cls:'nb-mkt'},
+    {url:'https://news.google.com/rss/search?q=mergers+acquisitions+IPO+earnings+when:1d&hl=en-US&gl=US&ceid=US:en',                 cat:'Finance', cls:'nb-fin'},
+    // ── Google News search feeds — Tech & Enterprise ──
+    {url:'https://news.google.com/rss/search?q=artificial+intelligence+AI+when:1d&hl=en-US&gl=US&ceid=US:en',                        cat:'AI',      cls:'nb-tech'},
+    {url:'https://news.google.com/rss/search?q=Oracle+SAP+ERP+cloud+enterprise+when:1d&hl=en-US&gl=US&ceid=US:en',                   cat:'ERP',     cls:'nb-tech'},
+    {url:'https://news.google.com/rss/search?q=Microsoft+Google+Amazon+cloud+when:1d&hl=en-US&gl=US&ceid=US:en',                     cat:'Tech',    cls:'nb-tech'},
+    // ── Google News search feeds — World & Politics ──
+    {url:'https://news.google.com/rss/search?q=international+politics+diplomacy+when:1d&hl=en-US&gl=US&ceid=US:en',                  cat:'World',   cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=Europe+EU+geopolitics+when:1d&hl=en-US&gl=US&ceid=US:en',                             cat:'Europe',  cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=Asia+China+Japan+India+economy+when:1d&hl=en-US&gl=US&ceid=US:en',                    cat:'Asia',    cls:'nb-world'},
+    // ── UK / EU feeds ──
+    {url:'https://news.google.com/rss/search?q=financial+markets+business+when:1d&hl=en-GB&gl=GB&ceid=GB:en',                        cat:'Finance', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=economia+finanza+mercati+borse+when:1d&hl=it&gl=IT&ceid=IT:it',                       cat:'Mercati', cls:'nb-mkt'},
+    {url:'https://news.google.com/rss/search?q=notizie+internazionali+mondo+when:1d&hl=it&gl=IT&ceid=IT:it',                         cat:'Mondo',   cls:'nb-world'},
+    // ── Germany / France ──
+    {url:'https://news.google.com/rss/search?q=wirtschaft+finanzen+when:1d&hl=de&gl=DE&ceid=DE:de',                                  cat:'Wirtsch.',cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=economie+finance+marches+when:1d&hl=fr&gl=FR&ceid=FR:fr',                             cat:'Finance', cls:'nb-fin'}
   ];
 
-  var _liveNews=[]; // buffer notizie live accumulate
-  var _seenTitles=new Set(); // deduplicazione
-  var _fetchIndex=0; // fetch ciclico dei feed
-
+  // 3 proxy CORS con fallback automatico
   var CORS_PROXIES=[
-    'https://api.allorigins.win/get?url=',
-    'https://corsproxy.io/?'
+    function(u){return 'https://api.allorigins.win/get?url='+encodeURIComponent(u);},
+    function(u){return 'https://corsproxy.io/?'+encodeURIComponent(u);},
+    function(u){return 'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u);}
   ];
   var _proxyIdx=0;
 
-  function fetchOneSource(src){
-    var proxy=CORS_PROXIES[_proxyIdx%CORS_PROXIES.length];
-    var fetchUrl= proxy==='https://corsproxy.io/?'
-      ? proxy+encodeURIComponent(src.url)
-      : proxy+encodeURIComponent(src.url);
-    return fetch(fetchUrl,{signal:AbortSignal.timeout(8000)})
-      .then(function(r){return r.json();})
+  var _liveNews=[];       // buffer notizie (più recenti prima)
+  var _seenKeys=new Set();// deduplicazione
+  var _fetchIdx=0;        // indice ciclico dei feed
+  var _newCount=0;        // counter "new" badge
+
+  // Pulisce il testo del titolo RSS
+  function cleanTitle(raw){
+    return raw
+      .replace(/<!\[CDATA\[|\]\]>/g,'')
+      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+      .replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+      .replace(/\s*[-–|]\s*(Reuters|BBC|Bloomberg|CNN|AP|AFP|FT|WSJ|NYT|Guardian|CNBC|Handelsblatt|Le Monde|Corriere)\s*$/i,'')
+      .trim();
+  }
+
+  // Fetch un singolo feed con failover proxy
+  function fetchFeed(src, proxyFn){
+    return fetch(proxyFn(src.url),{signal:AbortSignal.timeout(9000)})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
       .then(function(j){
-        var raw=j.contents||j.body||j;
-        var doc=new DOMParser().parseFromString(typeof raw==='string'?raw:'','text/xml');
-        return Array.from(doc.querySelectorAll('item')).slice(0,8)
+        var raw=j.contents||j.body||(typeof j==='string'?j:'');
+        if(!raw||raw.length<100)throw new Error('empty');
+        var doc=new DOMParser().parseFromString(raw,'text/xml');
+        if(doc.querySelector('parsererror'))throw new Error('parse error');
+        return Array.from(doc.querySelectorAll('item')).slice(0,10)
           .map(function(el){
-            var titleEl=el.querySelector('title');
-            if(!titleEl)return null;
-            var txt=titleEl.textContent
-              .replace(/<!\[CDATA\[|\]\]>/g,'')
-              .replace(/\s*-\s*(Reuters|BBC|Bloomberg|CNN|AP|AFP|Guardian|NYT|FT)\s*$/i,'')
-              .trim();
-            return txt.length>15?{t:txt,cat:src.cat,cls:src.cls}:null;
+            var t=el.querySelector('title');
+            if(!t)return null;
+            var txt=cleanTitle(t.textContent);
+            if(txt.length<20)return null;
+            // Pubdate per ordinamento
+            var pd=el.querySelector('pubDate');
+            var ts=pd?new Date(pd.textContent).getTime():Date.now();
+            return {t:txt,cat:src.cat,cls:src.cls,ts:ts};
           }).filter(Boolean);
       });
   }
 
-  function injectLiveItems(newItems){
+  // Prova proxy in cascata
+  function fetchWithFallback(src){
+    var attempt=_proxyIdx;
+    function tryProxy(i){
+      if(i>=CORS_PROXIES.length)return Promise.reject(new Error('all proxies failed'));
+      return fetchFeed(src,CORS_PROXIES[(attempt+i)%CORS_PROXIES.length])
+        .catch(function(){return tryProxy(i+1);});
+    }
+    return tryProxy(0);
+  }
+
+  // Inietta nuove notizie nel buffer e aggiorna ticker
+  function injectItems(items){
     var added=0;
-    newItems.forEach(function(item){
-      var key=item.t.slice(0,60);
-      if(!_seenTitles.has(key)){
-        _seenTitles.add(key);
-        _liveNews.unshift(item); // metti le più recenti in cima
+    // Ordina per timestamp decrescente prima di inserire
+    items.sort(function(a,b){return b.ts-a.ts;});
+    items.forEach(function(item){
+      var key=item.t.slice(0,55).toLowerCase();
+      if(!_seenKeys.has(key)){
+        _seenKeys.add(key);
+        _liveNews.unshift(item);
         added++;
       }
     });
-    if(_liveNews.length>60)_liveNews=_liveNews.slice(0,60); // cap 60 notizie
-    if(added>0)renderTicker(_liveNews.length>=4?_liveNews:_liveNews.concat(FALLBACK));
+    if(_liveNews.length>80)_liveNews=_liveNews.slice(0,80);
+    if(added>0){
+      _newCount+=added;
+      renderTicker();
+      flashNewsBadge();
+    }
   }
 
-  function renderTicker(items){
+  // Render ticker con le notizie correnti
+  function renderTicker(){
     var track=document.getElementById('vft-news-track');
     if(!track)return;
-    var pool=items.slice(0,40); // max 40 nel ticker
+    var pool=(_liveNews.length>=4?_liveNews:_liveNews.concat(FALLBACK)).slice(0,50);
     var html=[].concat(pool,pool).map(function(i){
-      return'<span class="tb-news-item"><span class="nb-cat '+i.cls+'">'+i.cat+'</span>'+esc(i.t)+'</span><span class="tb-news-sep">◆</span>';
+      return '<span class="tb-news-item"><span class="nb-cat '+i.cls+'">'+i.cat+'</span>'+esc(i.t)+'</span><span class="tb-news-sep">◆</span>';
     }).join('');
+    // Preserva posizione animazione: ricrea con stesso duration
+    var dur=track.style.animationDuration||'80s';
+    track.style.animation='none';
     track.innerHTML=html;
-    track.style.animationDuration='80s';
+    // Force reflow
+    void track.offsetWidth;
+    track.style.animation='tbNewsScroll '+dur+' linear infinite';
   }
 
-  // Fetch ciclico: ogni 90s carica UN feed diverso (evita rate-limit)
-  function fetchNextSource(){
-    var src=NEWS_SOURCES[_fetchIndex%NEWS_SOURCES.length];
-    _fetchIndex++;
-    fetchOneSource(src)
-      .then(injectLiveItems)
-      .catch(function(){
-        // prova proxy alternativo al prossimo giro
-        _proxyIdx++;
-      });
+  // Flash arancione sul badge "LIVE NEWS" quando arrivano notizie
+  function flashNewsBadge(){
+    var label=document.querySelector('.tb-news-label');
+    if(!label)return;
+    label.style.transition='background 0.3s';
+    label.style.background='rgba(255,128,0,0.55)';
+    setTimeout(function(){label.style.background='';},900);
   }
 
-  // Avvio immediato: carica i primi 3 feed subito
-  renderTicker(FALLBACK);
-  [0,1,2].forEach(function(i){
+  // Fetch un feed alla volta in ciclo (evita burst)
+  function fetchNextCyclic(){
+    var src=NEWS_SOURCES[_fetchIdx%NEWS_SOURCES.length];
+    _fetchIdx++;
+    fetchWithFallback(src)
+      .then(injectItems)
+      .catch(function(){_proxyIdx=(_proxyIdx+1)%CORS_PROXIES.length;});
+  }
+
+  // ── BOOT: mostra fallback, poi carica TUTTI i feed in parallelo ──
+  renderTicker();
+
+  // Round 1: carica tutti i feed in parallelo subito (staggered 300ms)
+  NEWS_SOURCES.forEach(function(src,i){
     setTimeout(function(){
-      var src=NEWS_SOURCES[i%NEWS_SOURCES.length];
-      _fetchIndex=i+1;
-      fetchOneSource(src).then(injectLiveItems).catch(function(){});
-    },i*2500);
+      fetchWithFallback(src).then(injectItems).catch(function(){});
+    }, i*300);
   });
 
-  // Poi continua a girare ogni 90 secondi
-  setInterval(fetchNextSource,90*1000);
+  // Round 2+: ciclo continuo ogni 30 secondi (un feed diverso per giro)
+  setInterval(fetchNextCyclic, 30*1000);
+
+  // Round 3: ogni 5 minuti ricarica TUTTI i feed di nuovo (full refresh)
+  setInterval(function(){
+    NEWS_SOURCES.forEach(function(src,i){
+      setTimeout(function(){
+        fetchWithFallback(src).then(injectItems).catch(function(){});
+      }, i*400);
+    });
+  }, 5*60*1000);
 })();
 </script>
 
