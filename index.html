@@ -317,18 +317,14 @@
     SAP :{name:'SAP SE ADR',       ex:'NYSE',price:181.79,change:-1.33, pct:-0.73,open:182.00,high:182.82,low:175.10,vol:'~2.1M', mktcap:'$211.0B',pe:'24.35',wk52h:313.28,wk52l:158.58,note:'Chiusura NYSE 1 giu 2026. Quotata anche su Xetra (SAP.DE).'}
   };
   var FALLBACK=[
-    {t:'Markets rally as Fed signals pause in rate cycle',                             cat:'Bloomberg',   cls:'nb-fin'},
-    {t:'Global trade tensions ease after G7 summit agreement',                        cat:'Reuters',     cls:'nb-mkt'},
-    {t:'Oracle cloud revenue surges on AI infrastructure demand',                     cat:'FT',          cls:'nb-fin'},
-    {t:'The long-term outlook for European equities in 2026',                         cat:'Economist',   cls:'nb-world'},
-    {t:'SAP accelerates RISE migration across Fortune 500 clients',                   cat:'Bloomberg',   cls:'nb-fin'},
-    {t:'Borse europee in rialzo, spread BTp-Bund sotto quota 120',                    cat:'Sole 24 Ore', cls:'nb-fin'},
-    {t:'Il governo approva il piano strategico per la digitalizzazione della PA',      cat:'Corriere',    cls:'nb-world'},
-    {t:'Serie A: la Juventus vince il derby, Milan a -3 in classifica',               cat:'Gazzetta',    cls:'nb-mkt'},
-    {t:'Inflazione in calo in Italia: a maggio +1,2% su base annua',                 cat:'Repubblica',  cls:'nb-world'},
-    {t:'Energia, il prezzo del gas torna sotto i 30 euro al megawattora',             cat:'Il Giornale', cls:'nb-world'},
-    {t:'ECB holds rates as eurozone growth beats expectations',                       cat:'Reuters',     cls:'nb-mkt'},
-    {t:'AI regulation: Brussels moves toward mandatory transparency rules',            cat:'Economist',   cls:'nb-world'}
+    {t:'Markets rally as Fed signals pause in rate cycle',                        cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Oracle cloud revenue surges on AI infrastructure demand',                 cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'ECB holds rates as eurozone growth beats expectations',                   cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Global trade tensions ease after G7 summit agreement',                   cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Borse europee in rialzo, spread BTp-Bund sotto quota 120',               cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Il governo approva il piano per la digitalizzazione della PA',            cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Inflazione in calo in Italia: a maggio +1,2% su base annua',             cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Energia, il prezzo del gas torna sotto i 30 euro al megawattora',        cat:'Sole 24 Ore', cls:'nb-fin'}
   ];
   var activeStock=null;
   function fmt(tz){return new Date().toLocaleTimeString('it-IT',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
@@ -413,19 +409,10 @@
   // LIVE NEWS ENGINE — multi-source international, continuous refresh
   // ══════════════════════════════════════════════════════════════════
 
-  // Fonti specifiche: IT = testate italiane, EN = testate internazionali
+  // Fonti: Bloomberg (EN) e Il Sole 24 Ore (IT)
   var NEWS_SOURCES=[
-    // ── ITALIANO — testate italiane ──
-    {url:'https://news.google.com/rss/search?q=when:1d+site:ilsole24ore.com&hl=it&gl=IT&ceid=IT:it',          cat:'Sole 24 Ore', cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:ilgiornale.it&hl=it&gl=IT&ceid=IT:it',            cat:'Il Giornale', cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:corriere.it&hl=it&gl=IT&ceid=IT:it',              cat:'Corriere',    cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:gazzetta.it&hl=it&gl=IT&ceid=IT:it',              cat:'Gazzetta',    cls:'nb-mkt'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:repubblica.it&hl=it&gl=IT&ceid=IT:it',            cat:'Repubblica',  cls:'nb-world'},
-    // ── INGLESE — testate internazionali ──
-    {url:'https://news.google.com/rss/search?q=when:1d+site:bloomberg.com&hl=en-US&gl=US&ceid=US:en',         cat:'Bloomberg',   cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:ft.com&hl=en-US&gl=US&ceid=US:en',               cat:'FT',          cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:economist.com&hl=en-US&gl=US&ceid=US:en',         cat:'Economist',   cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:reuters.com&hl=en-US&gl=US&ceid=US:en',           cat:'Reuters',     cls:'nb-mkt'}
+    {url:'https://news.google.com/rss/search?q=when:1d+site:bloomberg.com&hl=en-US&gl=US&ceid=US:en',       cat:'Bloomberg',   cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:ilsole24ore.com&hl=it&gl=IT&ceid=IT:it',       cat:'Sole 24 Ore', cls:'nb-fin'}
   ];
 
   // 3 proxy CORS con fallback automatico
