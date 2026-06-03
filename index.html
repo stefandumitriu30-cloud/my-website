@@ -793,7 +793,8 @@
       _speakerOn = false;
       _speechSession++;
       updateSpeakerBtn();
-      // Ferma qualsiasi audio in corso
+      // Ferma ENTRAMBI gli audio in corso
+      if (_audioEN) { try { _audioEN.pause(); _audioEN.currentTime = 0; } catch(e){} }
       if (_audioIT) { try { _audioIT.pause(); _audioIT.currentTime = 0; } catch(e){} }
       window.speechSynthesis && window.speechSynthesis.cancel();
     }
