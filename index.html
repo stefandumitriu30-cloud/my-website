@@ -426,7 +426,8 @@
       requestAnimationFrame(mobileStep);
     }
     requestAnimationFrame(mobileStep);
-  })();=function(sym){
+  })();
+  window.vftTogglePanel=function(sym){
     var panel=document.getElementById('vft-stock-panel');
     if(activeStock===sym&&panel.classList.contains('open')){panel.classList.remove('open');panel.innerHTML='';activeStock=null;return;}
     activeStock=sym;panel.classList.add('open');
