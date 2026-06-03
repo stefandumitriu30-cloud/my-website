@@ -317,14 +317,18 @@
     SAP :{name:'SAP SE ADR',       ex:'NYSE',price:181.79,change:-1.33, pct:-0.73,open:182.00,high:182.82,low:175.10,vol:'~2.1M', mktcap:'$211.0B',pe:'24.35',wk52h:313.28,wk52l:158.58,note:'Chiusura NYSE 1 giu 2026. Quotata anche su Xetra (SAP.DE).'}
   };
   var FALLBACK=[
-    {t:'Markets rally as Fed signals pause in rate cycle',                        cat:'Bloomberg',   cls:'nb-fin'},
-    {t:'Oracle cloud revenue surges on AI infrastructure demand',                 cat:'Bloomberg',   cls:'nb-fin'},
-    {t:'ECB holds rates as eurozone growth beats expectations',                   cat:'Bloomberg',   cls:'nb-fin'},
-    {t:'Global trade tensions ease after G7 summit agreement',                   cat:'Bloomberg',   cls:'nb-fin'},
-    {t:'Borse europee in rialzo, spread BTp-Bund sotto quota 120',               cat:'Sole 24 Ore', cls:'nb-fin'},
-    {t:'Il governo approva il piano per la digitalizzazione della PA',            cat:'Sole 24 Ore', cls:'nb-fin'},
-    {t:'Inflazione in calo in Italia: a maggio +1,2% su base annua',             cat:'Sole 24 Ore', cls:'nb-fin'},
-    {t:'Energia, il prezzo del gas torna sotto i 30 euro al megawattora',        cat:'Sole 24 Ore', cls:'nb-fin'}
+    {t:'Markets rally as Fed signals pause in rate cycle',                              cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Oracle cloud revenue surges on AI infrastructure demand',                      cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'ECB holds rates as eurozone growth beats expectations',                        cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Global trade tensions ease after G7 summit agreement',                        cat:'Bloomberg',   cls:'nb-world'},
+    {t:'Commodities rebound on strong demand signals from Asia',                      cat:'Bloomberg',   cls:'nb-mkt'},
+    {t:'Tech giants report higher than expected Q2 earnings',                         cat:'Bloomberg',   cls:'nb-tech'},
+    {t:'Borse europee in rialzo, spread BTp-Bund sotto quota 120',                    cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Il governo approva il piano per la digitalizzazione della PA',                 cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Inflazione in calo in Italia: a maggio +1,2% su base annua',                  cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Energia, il prezzo del gas torna sotto i 30 euro al megawattora',             cat:'Sole 24 Ore', cls:'nb-mkt'},
+    {t:'Banca d'Italia: credito alle imprese in crescita nel primo trimestre',       cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Pil italiano: stime riviste al rialzo per il 2026',                           cat:'Sole 24 Ore', cls:'nb-world'}
   ];
   var activeStock=null;
   function fmt(tz){return new Date().toLocaleTimeString('it-IT',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
@@ -409,10 +413,22 @@
   // LIVE NEWS ENGINE — multi-source international, continuous refresh
   // ══════════════════════════════════════════════════════════════════
 
-  // Fonti: Bloomberg (EN) e Il Sole 24 Ore (IT)
+  // Fonti: Bloomberg (EN internazionale) e Il Sole 24 Ore (IT)
   var NEWS_SOURCES=[
-    {url:'https://news.google.com/rss/search?q=when:1d+site:bloomberg.com&hl=en-US&gl=US&ceid=US:en',       cat:'Bloomberg',   cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=when:1d+site:ilsole24ore.com&hl=it&gl=IT&ceid=IT:it',       cat:'Sole 24 Ore', cls:'nb-fin'}
+    // Bloomberg — multiple query angles to maximize unique articles
+    {url:'https://news.google.com/rss/search?q=when:6h+site:bloomberg.com+finance&hl=en-US&gl=US&ceid=US:en',              cat:'Bloomberg', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:bloomberg.com+markets&hl=en-US&gl=US&ceid=US:en',             cat:'Bloomberg', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:bloomberg.com+technology&hl=en-US&gl=US&ceid=US:en',          cat:'Bloomberg', cls:'nb-tech'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:bloomberg.com+economy&hl=en-US&gl=US&ceid=US:en',             cat:'Bloomberg', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:bloomberg.com+politics&hl=en-US&gl=US&ceid=US:en',            cat:'Bloomberg', cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:bloomberg.com+energy&hl=en-US&gl=US&ceid=US:en',              cat:'Bloomberg', cls:'nb-mkt'},
+    // Il Sole 24 Ore — multiple query angles
+    {url:'https://news.google.com/rss/search?q=when:6h+site:ilsole24ore.com+economia&hl=it&gl=IT&ceid=IT:it',             cat:'Sole 24 Ore', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:ilsole24ore.com+finanza&hl=it&gl=IT&ceid=IT:it',              cat:'Sole 24 Ore', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:ilsole24ore.com+mercati&hl=it&gl=IT&ceid=IT:it',              cat:'Sole 24 Ore', cls:'nb-mkt'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:ilsole24ore.com+tecnologia&hl=it&gl=IT&ceid=IT:it',           cat:'Sole 24 Ore', cls:'nb-tech'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:ilsole24ore.com+imprese&hl=it&gl=IT&ceid=IT:it',              cat:'Sole 24 Ore', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:6h+site:ilsole24ore.com+mondo&hl=it&gl=IT&ceid=IT:it',                cat:'Sole 24 Ore', cls:'nb-world'}
   ];
 
   // 3 proxy CORS con fallback automatico
@@ -535,18 +551,18 @@
   NEWS_SOURCES.forEach(function(src,i){
     setTimeout(function(){
       fetchWithFallback(src).then(injectItems).catch(function(){});
-    }, i*300);
+    }, i*500);
   });
 
-  // Round 2+: ciclo continuo ogni 30 secondi (un feed diverso per giro)
-  setInterval(fetchNextCyclic, 30*1000);
+  // Round 2+: ciclo continuo ogni 20 secondi (un feed diverso per giro)
+  setInterval(fetchNextCyclic, 20*1000);
 
   // Round 3: ogni 5 minuti ricarica TUTTI i feed di nuovo (full refresh)
   setInterval(function(){
     NEWS_SOURCES.forEach(function(src,i){
       setTimeout(function(){
         fetchWithFallback(src).then(injectItems).catch(function(){});
-      }, i*400);
+      }, i*500);
     });
   }, 5*60*1000);
 })();
