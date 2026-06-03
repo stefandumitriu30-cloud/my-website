@@ -217,11 +217,10 @@
   .tb-clock .time { font-size:12px; font-weight:500; color:#E0E8FF; font-variant-numeric:tabular-nums; display:block; line-height:1.2; }
   .tb-div { width:1px; height:18px; background:rgba(255,255,255,.10); flex-shrink:0; margin:0 10px; }
   .tb-news-wrap { flex:1; display:flex; align-items:center; overflow:hidden; min-width:0; position:relative; }
-  .tb-news-wrap::before { content:''; position:absolute; left:0; top:0; bottom:0; width:28px; background:linear-gradient(to right,#0D1B2A,transparent); z-index:2; pointer-events:none; }
-  .tb-news-label { font-size:9px; font-weight:700; color:#FF8000; letter-spacing:.8px; text-transform:uppercase; background:rgba(255,128,0,.14); border:.5px solid rgba(255,128,0,.35); border-radius:3px; padding:2px 6px; flex-shrink:0; margin-right:8px; z-index:3; }
-  .tb-news-inner { flex:1; overflow:hidden; min-width:0; }
-  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 80s linear infinite; }
-  .tb-news-track:hover { animation-play-state:paused; }
+
+  .tb-news-label { font-size:9px; font-weight:700; color:#FF8000; letter-spacing:.8px; text-transform:uppercase; background:rgba(255,128,0,.14); border:.5px solid rgba(255,128,0,.35); border-radius:3px; padding:2px 6px; flex-shrink:0; margin-right:8px; }
+  .tb-news-inner { flex:1; overflow:hidden; min-width:0; position:relative; }
+  .tb-news-track { display:flex; white-space:nowrap; will-change:transform; }
   @keyframes tbNewsScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
   .tb-news-item { display:inline-flex; align-items:center; gap:5px; padding:0 22px 0 0; font-size:11.5px; color:#C8D8F0; }
   .tb-news-sep  { display:inline-block; color:rgba(255,255,255,.18); margin-right:22px; font-size:10px; }
@@ -291,8 +290,8 @@
   <div id="vft-topbar-inner">
     <div class="tb-clocks" id="vft-clocks"></div>
     <div class="tb-div"></div>
+    <span class="tb-news-label">LIVE NEWS</span>
     <div class="tb-news-wrap">
-      <span class="tb-news-label">LIVE NEWS</span>
       <div class="tb-news-inner"><div class="tb-news-track" id="vft-news-track"></div></div>
     </div>
     <div class="tb-div"></div>
@@ -348,59 +347,6 @@
   },1000);
   // Build chips
   document.getElementById('vft-stocks').innerHTML=Object.keys(STOCKS).map(function(sym){var s=STOCKS[sym];var up=s.pct>=0;var arr=up?'▲':'▼';var sign=up?'+':'';return'<div class="tb-stock-chip" onclick="vftTogglePanel(\''+sym+'\')" title="'+s.name+'"><span class="ch-tick">'+sym+'</span><span class="ch-px">$'+s.price.toFixed(2)+'</span><span class="ch-chg '+(up?'ch-up':'ch-down')+'">'+arr+sign+s.pct.toFixed(2)+'%</span></div>';}).join('');
-  // On mobile: JS infinite scroll using requestAnimationFrame (no CSS animation conflicts)
-  (function(){
-    if(window.innerWidth>768)return;
-    var topbar=document.getElementById('vft-topbar');
-    var inner=document.getElementById('vft-topbar-inner');
-    if(!topbar||!inner)return;
-
-    // Remove duplicate half from news track (was doubled for desktop CSS loop)
-    var track=document.getElementById('vft-news-track');
-    if(track){
-      var items=track.querySelectorAll('.tb-news-item, .tb-news-sep');
-      var total=items.length;
-      var half=Math.floor(total/2);
-      for(var i=total-1;i>=half;i--){
-        if(items[i].parentNode)items[i].parentNode.removeChild(items[i]);
-      }
-    }
-
-    // Build scroll wrapper: [copy A][copy B] — when copy A exits left, jump back to start
-    var wrap=document.createElement('div');
-    wrap.id='vft-topbar-scroll';
-    wrap.style.cssText='display:flex;align-items:center;gap:0;will-change:transform;';
-    topbar.removeChild(inner);
-    wrap.appendChild(inner);
-
-    // Clone inner (copy B), remap IDs
-    var clone=inner.cloneNode(true);
-    clone.removeAttribute('id');
-    clone.querySelectorAll('[id]').forEach(function(el){
-      el.setAttribute('id','c2_'+el.getAttribute('id'));
-    });
-    ZONES.forEach(function(z){
-      var el=clone.querySelector('#c2_vftc_'+z.tz.replace(/\//g,'_'));
-      if(el)el.textContent=fmt(z.tz);
-    });
-    wrap.appendChild(clone);
-    topbar.appendChild(wrap);
-
-    // rAF scroll: 1px per ~8ms = ~120px/s → full loop ~screen-width*2 seconds
-    var pos=0;
-    var speed=0.045; // px per ms — fast scroll
-    var last=null;
-    function step(ts){
-      if(last===null)last=ts;
-      var dt=ts-last; last=ts;
-      pos+=speed*dt;
-      var halfW=inner.offsetWidth;
-      if(halfW>0 && pos>=halfW) pos=pos-halfW; // seamless jump
-      wrap.style.transform='translateX(-'+pos+'px)';
-      requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  })();
   // Panel
   window.vftTogglePanel=function(sym){
     var panel=document.getElementById('vft-stock-panel');
@@ -510,59 +456,91 @@
   }
 
   // Render ticker con le notizie correnti
-  function renderTicker(){
-    var track=document.getElementById('vft-news-track');
-    if(!track)return;
-    var pool=(_liveNews.length>=4?_liveNews:_liveNews.concat(FALLBACK)).slice(0,50);
-    var html=[].concat(pool,pool).map(function(i){
+  // ── TICKER rAF ENGINE (desktop + mobile, posizione mai resettata) ──
+  var _tickerPos   = 0;
+  var _tickerLast  = null;
+  var _SPEED       = 80;    // px/s — aumenta per più velocità
+  var _tickerDirty = false;
+
+  function buildTrackHTML(pool){
+    return [].concat(pool,pool).map(function(i){
       return '<span class="tb-news-item"><span class="nb-cat '+i.cls+'">'+i.cat+'</span>'+esc(i.t)+'</span><span class="tb-news-sep">◆</span>';
     }).join('');
-    // Preserva posizione animazione: ricrea con stesso duration
-    var dur=track.style.animationDuration||'80s';
-    track.style.animation='none';
-    track.innerHTML=html;
-    // Force reflow
-    void track.offsetWidth;
-    track.style.animation='tbNewsScroll '+dur+' linear infinite';
   }
 
-  // Flash arancione sul badge "LIVE NEWS" quando arrivano notizie
-  function flashNewsBadge(){
-    var label=document.querySelector('.tb-news-label');
-    if(!label)return;
-    label.style.transition='background 0.3s';
-    label.style.background='rgba(255,128,0,0.55)';
-    setTimeout(function(){label.style.background='';},900);
+  function initTicker(){
+    var track=document.getElementById('vft-news-track');
+    if(!track)return;
+    track.innerHTML=buildTrackHTML(FALLBACK);
+    requestAnimationFrame(tickerStep);
   }
 
-  // Fetch un feed alla volta in ciclo (evita burst)
+  function refreshTrack(){
+    var track=document.getElementById('vft-news-track');
+    if(!track)return;
+    var pool=(_liveNews.length>=4?_liveNews:_liveNews.concat(FALLBACK)).slice(0,60);
+    var newHTML=buildTrackHTML(pool);
+    if(track.innerHTML===newHTML)return;
+    var halfW=track.scrollWidth/2||1;
+    track.innerHTML=newHTML;
+    var newHalfW=track.scrollWidth/2||1;
+    _tickerPos=(_tickerPos/halfW)*newHalfW;
+    _tickerDirty=false;
+  }
+
+  function tickerStep(ts){
+    if(_tickerLast===null)_tickerLast=ts;
+    var dt=Math.min(ts-_tickerLast,50);
+    _tickerLast=ts;
+    var track=document.getElementById('vft-news-track');
+    if(track){
+      var halfW=track.scrollWidth/2;
+      if(halfW>0){
+        _tickerPos+=_SPEED*(dt/1000);
+        if(_tickerPos>=halfW)_tickerPos-=halfW;
+        track.style.transform='translateX(-'+_tickerPos.toFixed(2)+'px)';
+      }
+      if(_tickerDirty)refreshTrack();
+    }
+    requestAnimationFrame(tickerStep);
+  }
+
+  function injectItems(newItems){
+    var added=0;
+    newItems.sort(function(a,b){return b.ts-a.ts;});
+    newItems.forEach(function(item){
+      var key=item.t.slice(0,55).toLowerCase();
+      if(!_seenKeys.has(key)){
+        _seenKeys.add(key);
+        _liveNews.unshift(item);
+        added++;
+      }
+    });
+    if(_liveNews.length>80)_liveNews=_liveNews.slice(0,80);
+    if(added>0){ _tickerDirty=true; flashNewsBadge(); }
+  }
+
   function fetchNextCyclic(){
     var src=NEWS_SOURCES[_fetchIdx%NEWS_SOURCES.length];
     _fetchIdx++;
-    fetchWithFallback(src)
-      .then(injectItems)
-      .catch(function(){_proxyIdx=(_proxyIdx+1)%CORS_PROXIES.length;});
+    fetchWithFallback(src).then(injectItems).catch(function(){_proxyIdx=(_proxyIdx+1)%CORS_PROXIES.length;});
   }
 
-  // ── BOOT: mostra fallback, poi carica TUTTI i feed in parallelo ──
-  renderTicker();
+  initTicker();
 
-  // Round 1: carica tutti i feed in parallelo subito (staggered 300ms)
   NEWS_SOURCES.forEach(function(src,i){
     setTimeout(function(){
       fetchWithFallback(src).then(injectItems).catch(function(){});
-    }, i*500);
+    }, i*600);
   });
 
-  // Round 2+: ciclo continuo ogni 20 secondi (un feed diverso per giro)
-  setInterval(fetchNextCyclic, 20*1000);
+  setInterval(fetchNextCyclic, 25*1000);
 
-  // Round 3: ogni 5 minuti ricarica TUTTI i feed di nuovo (full refresh)
   setInterval(function(){
     NEWS_SOURCES.forEach(function(src,i){
       setTimeout(function(){
         fetchWithFallback(src).then(injectItems).catch(function(){});
-      }, i*500);
+      }, i*600);
     });
   }, 5*60*1000);
 })();
