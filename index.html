@@ -317,21 +317,18 @@
     SAP :{name:'SAP SE ADR',       ex:'NYSE',price:181.79,change:-1.33, pct:-0.73,open:182.00,high:182.82,low:175.10,vol:'~2.1M', mktcap:'$211.0B',pe:'24.35',wk52h:313.28,wk52l:158.58,note:'Chiusura NYSE 1 giu 2026. Quotata anche su Xetra (SAP.DE).'}
   };
   var FALLBACK=[
-    {t:'Oracle shares surge on AI cloud bookings record — NYSE:ORCL $248.15',cat:'Finance',cls:'nb-fin'},
-    {t:'SAP reports cloud revenue growth of 33% year-over-year — NYSE:SAP $181.79',cat:'Finance',cls:'nb-fin'},
-    {t:'Federal Reserve holds rates steady as inflation falls toward 2% target',cat:'Markets',cls:'nb-mkt'},
-    {t:'EU AI Act enforcement rules approved — tech companies face compliance deadlines',cat:'Tech',cls:'nb-tech'},
-    {t:'ECB signals cautious rate path amid mixed eurozone growth data',cat:'Finance',cls:'nb-fin'},
-    {t:'Microsoft Azure and Oracle OCI announce expanded interconnect for AI workloads',cat:'Tech',cls:'nb-tech'},
-    {t:'S&P 500 closes above 5,900 for third week on strong earnings momentum',cat:'Markets',cls:'nb-mkt'},
-    {t:'Italian government unveils €4bn digital transformation plan for public sector',cat:'World',cls:'nb-world'},
-    {t:'SAP RISE migration accelerates — 60% of Fortune 500 now on cloud ERP',cat:'Tech',cls:'nb-tech'},
-    {t:'Gold hits $2,480/oz as geopolitical risk premium rises across Asian markets',cat:'Markets',cls:'nb-mkt'},
-    {t:'OpenAI signs $4bn Oracle Cloud Infrastructure deal for GPT-5 training',cat:'Tech',cls:'nb-tech'},
-    {t:'Euro/Dollar holds near 1.09 ahead of ECB policy statement',cat:'Finance',cls:'nb-fin'},
-    {t:'G7 leaders agree on new framework for AI governance and digital trade',cat:'World',cls:'nb-world'},
-    {t:'China manufacturing PMI rises to highest level in 14 months',cat:'Markets',cls:'nb-mkt'},
-    {t:'UK economy grows 0.4% in Q1 2026, beating analyst expectations',cat:'World',cls:'nb-world'}
+    {t:'Markets rally as Fed signals pause in rate cycle',                             cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Global trade tensions ease after G7 summit agreement',                        cat:'Reuters',     cls:'nb-mkt'},
+    {t:'Oracle cloud revenue surges on AI infrastructure demand',                     cat:'FT',          cls:'nb-fin'},
+    {t:'The long-term outlook for European equities in 2026',                         cat:'Economist',   cls:'nb-world'},
+    {t:'SAP accelerates RISE migration across Fortune 500 clients',                   cat:'Bloomberg',   cls:'nb-fin'},
+    {t:'Borse europee in rialzo, spread BTp-Bund sotto quota 120',                    cat:'Sole 24 Ore', cls:'nb-fin'},
+    {t:'Il governo approva il piano strategico per la digitalizzazione della PA',      cat:'Corriere',    cls:'nb-world'},
+    {t:'Serie A: la Juventus vince il derby, Milan a -3 in classifica',               cat:'Gazzetta',    cls:'nb-mkt'},
+    {t:'Inflazione in calo in Italia: a maggio +1,2% su base annua',                 cat:'Repubblica',  cls:'nb-world'},
+    {t:'Energia, il prezzo del gas torna sotto i 30 euro al megawattora',             cat:'Il Giornale', cls:'nb-world'},
+    {t:'ECB holds rates as eurozone growth beats expectations',                       cat:'Reuters',     cls:'nb-mkt'},
+    {t:'AI regulation: Brussels moves toward mandatory transparency rules',            cat:'Economist',   cls:'nb-world'}
   ];
   var activeStock=null;
   function fmt(tz){return new Date().toLocaleTimeString('it-IT',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
@@ -416,33 +413,19 @@
   // LIVE NEWS ENGINE — multi-source international, continuous refresh
   // ══════════════════════════════════════════════════════════════════
 
-  // 20 fonti: solo inglese (world news) e italiano (notizie dall'Italia)
+  // Fonti specifiche: IT = testate italiane, EN = testate internazionali
   var NEWS_SOURCES=[
-    // ── INGLESE — Google News topic feeds (top headlines) ──
-    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'World',   cls:'nb-world'},
-    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTWtZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'Business',cls:'nb-fin'},
-    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNR1ptZHpRU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'Tech',    cls:'nb-tech'},
-    {url:'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNR05vYVRRU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',  cat:'Science', cls:'nb-tech'},
-    // ── INGLESE — Finance & Markets ──
-    {url:'https://news.google.com/rss/search?q=global+finance+markets+economy+when:1d&hl=en-US&gl=US&ceid=US:en',                     cat:'Finance', cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=stock+market+Wall+Street+S%26P+nasdaq+when:1d&hl=en-US&gl=US&ceid=US:en',             cat:'Markets', cls:'nb-mkt'},
-    {url:'https://news.google.com/rss/search?q=Federal+Reserve+ECB+interest+rates+inflation+when:1d&hl=en-US&gl=US&ceid=US:en',      cat:'Finance', cls:'nb-fin'},
-    {url:'https://news.google.com/rss/search?q=oil+gold+commodities+energy+when:1d&hl=en-US&gl=US&ceid=US:en',                       cat:'Markets', cls:'nb-mkt'},
-    {url:'https://news.google.com/rss/search?q=mergers+acquisitions+IPO+earnings+when:1d&hl=en-US&gl=US&ceid=US:en',                 cat:'Finance', cls:'nb-fin'},
-    // ── INGLESE — Tech & Enterprise ──
-    {url:'https://news.google.com/rss/search?q=artificial+intelligence+AI+when:1d&hl=en-US&gl=US&ceid=US:en',                        cat:'AI',      cls:'nb-tech'},
-    {url:'https://news.google.com/rss/search?q=Oracle+SAP+ERP+cloud+enterprise+when:1d&hl=en-US&gl=US&ceid=US:en',                   cat:'ERP',     cls:'nb-tech'},
-    {url:'https://news.google.com/rss/search?q=Microsoft+Google+Amazon+cloud+when:1d&hl=en-US&gl=US&ceid=US:en',                     cat:'Tech',    cls:'nb-tech'},
-    // ── INGLESE — World & Politics ──
-    {url:'https://news.google.com/rss/search?q=international+politics+diplomacy+when:1d&hl=en-US&gl=US&ceid=US:en',                  cat:'World',   cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=Europe+EU+geopolitics+when:1d&hl=en-US&gl=US&ceid=US:en',                             cat:'Europe',  cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=Asia+China+Japan+India+economy+when:1d&hl=en-US&gl=US&ceid=US:en',                    cat:'Asia',    cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=financial+markets+business+UK+when:1d&hl=en-GB&gl=GB&ceid=GB:en',                     cat:'Finance', cls:'nb-fin'},
-    // ── ITALIANO — notizie dall'Italia ──
-    {url:'https://news.google.com/rss/search?q=economia+finanza+mercati+borse+Italia+when:1d&hl=it&gl=IT&ceid=IT:it',                cat:'Mercati', cls:'nb-mkt'},
-    {url:'https://news.google.com/rss/search?q=notizie+Italia+politica+governo+when:1d&hl=it&gl=IT&ceid=IT:it',                      cat:'Italia',  cls:'nb-world'},
-    {url:'https://news.google.com/rss/search?q=tecnologia+digitale+innovazione+Italia+when:1d&hl=it&gl=IT&ceid=IT:it',               cat:'Tech IT', cls:'nb-tech'},
-    {url:'https://news.google.com/rss/search?q=imprese+aziende+lavoro+economia+italiana+when:1d&hl=it&gl=IT&ceid=IT:it',             cat:'Business',cls:'nb-fin'}
+    // ── ITALIANO — testate italiane ──
+    {url:'https://news.google.com/rss/search?q=when:1d+site:ilsole24ore.com&hl=it&gl=IT&ceid=IT:it',          cat:'Sole 24 Ore', cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:ilgiornale.it&hl=it&gl=IT&ceid=IT:it',            cat:'Il Giornale', cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:corriere.it&hl=it&gl=IT&ceid=IT:it',              cat:'Corriere',    cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:gazzetta.it&hl=it&gl=IT&ceid=IT:it',              cat:'Gazzetta',    cls:'nb-mkt'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:repubblica.it&hl=it&gl=IT&ceid=IT:it',            cat:'Repubblica',  cls:'nb-world'},
+    // ── INGLESE — testate internazionali ──
+    {url:'https://news.google.com/rss/search?q=when:1d+site:bloomberg.com&hl=en-US&gl=US&ceid=US:en',         cat:'Bloomberg',   cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:ft.com&hl=en-US&gl=US&ceid=US:en',               cat:'FT',          cls:'nb-fin'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:economist.com&hl=en-US&gl=US&ceid=US:en',         cat:'Economist',   cls:'nb-world'},
+    {url:'https://news.google.com/rss/search?q=when:1d+site:reuters.com&hl=en-US&gl=US&ceid=US:en',           cat:'Reuters',     cls:'nb-mkt'}
   ];
 
   // 3 proxy CORS con fallback automatico
