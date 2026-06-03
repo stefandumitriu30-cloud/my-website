@@ -471,14 +471,46 @@
   function initTicker(){
     var track=document.getElementById('vft-news-track');
     if(!track)return;
-    track.innerHTML=buildTrackHTML(FALLBACK);
+    // Usa già il pattern 2+2 anche sul fallback iniziale
+    var bloomberg = FALLBACK.filter(function(i){ return i.cat==='Bloomberg'; });
+    var sole      = FALLBACK.filter(function(i){ return i.cat==='Sole 24 Ore'; });
+    var pool=[], bi=0, si=0;
+    var maxP=Math.max(bloomberg.length,sole.length);
+    for(var p=0;p<maxP;p++){
+      for(var j=0;j<2;j++){ if(bi<bloomberg.length)pool.push(bloomberg[bi++]); }
+      for(var k=0;k<2;k++){ if(si<sole.length)pool.push(sole[si++]); }
+    }
+    track.innerHTML=buildTrackHTML(pool);
     requestAnimationFrame(tickerStep);
+  }
+
+  function buildInterleavedPool(){
+    // Separa le notizie Bloomberg e Sole 24 Ore
+    var src = _liveNews.length >= 4 ? _liveNews : _liveNews.concat(FALLBACK);
+    var bloomberg = src.filter(function(i){ return i.cat === 'Bloomberg'; });
+    var sole      = src.filter(function(i){ return i.cat === 'Sole 24 Ore'; });
+    // Fallback se una delle due è vuota
+    if (!bloomberg.length) bloomberg = FALLBACK.filter(function(i){ return i.cat === 'Bloomberg'; });
+    if (!sole.length)      sole      = FALLBACK.filter(function(i){ return i.cat === 'Sole 24 Ore'; });
+    // Intercala: 2 Bloomberg + 2 Sole 24 Ore alternati
+    var pool = [];
+    var bi = 0, si = 0;
+    var maxPairs = Math.max(bloomberg.length, sole.length);
+    for (var p = 0; p < maxPairs; p++) {
+      for (var j = 0; j < 2; j++) {
+        if (bi < bloomberg.length) pool.push(bloomberg[bi++]);
+      }
+      for (var k = 0; k < 2; k++) {
+        if (si < sole.length) pool.push(sole[si++]);
+      }
+    }
+    return pool.slice(0, 60);
   }
 
   function refreshTrack(){
     var track=document.getElementById('vft-news-track');
     if(!track)return;
-    var pool=(_liveNews.length>=4?_liveNews:_liveNews.concat(FALLBACK)).slice(0,60);
+    var pool = buildInterleavedPool();
     var newHTML=buildTrackHTML(pool);
     if(track.innerHTML===newHTML)return;
     var halfW=track.scrollWidth/2||1;
