@@ -19,7 +19,7 @@
     --radius: 12px;
   }
   html { scroll-behavior: smooth; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text-dark); background: var(--white); line-height: 1.7; padding-top:36px; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: var(--text-dark); background: var(--white); line-height: 1.7; padding-top:0; }
 
   /* LANG SWITCHER — integrato nella nav, non più fixed */
   .lang-switcher {
@@ -50,6 +50,8 @@
     box-shadow: 0 2px 16px rgba(45,91,227,0.07);
   }
   .nav-logo { justify-self: start; }
+  .lang-switcher { justify-self: end; }
+  .nav-logo img { height: 52px; display: block; object-fit: contain; }
   .nav-clocks {
     justify-self: center; display: flex; align-items: center; gap: 0;
   }
@@ -62,8 +64,6 @@
   .nav-clocks .tb-clock .flag { font-size: 14px; line-height:1; }
   .nav-clocks .tb-clock .city { font-size: 9px; color: #8898bb; text-transform: uppercase; letter-spacing:.6px; display: block; line-height:1.1; }
   .nav-clocks .tb-clock .time { font-size: 13px; font-weight: 600; color: #1a2a4a; font-variant-numeric: tabular-nums; display: block; line-height:1.2; }
-  .lang-switcher { justify-self: end; }
-  .nav-logo img { height: 52px; display: block; object-fit: contain; }
   /* nav-links: sempre a tendina */
   .nav-links {
     display: none; flex-direction: column; list-style: none;
@@ -201,80 +201,16 @@
   /* LANG VISIBILITY */
   .it { display: none; }
   html.lang-it .en { display: none; }
-  html.lang-it .it { display: unset; }
+  html.lang-it .it { display: inline; }
   /* block-level it elements */
   html.lang-it .it-block { display: block; }
   html.lang-it .en-block { display: none; }
   .it-block { display: none; }
   .en-block { display: block; }
-
-  /* ── TOPBAR ── */
-  #vft-topbar {
-    width:100%; background:#0D1B2A; height:36px;
-    display:flex; align-items:center; padding:0 16px;
-    position:fixed; top:0; z-index:1000; overflow:hidden; gap:0;
-  }
-  #vft-topbar-inner {
-    display:flex; align-items:center; gap:0; min-width:max-content;
-  }
-  .tb-div { width:1px; height:18px; background:rgba(255,255,255,.10); flex-shrink:0; margin:0 10px; }
-  .tb-news-wrap { flex:1; display:flex; align-items:center; overflow:hidden; min-width:0; position:relative; }
-  .tb-news-wrap::before { content:''; position:absolute; left:0; top:0; bottom:0; width:28px; background:linear-gradient(to right,#0D1B2A,transparent); z-index:2; pointer-events:none; }
-  .tb-news-label { font-size:9px; font-weight:700; color:#FF8000; letter-spacing:.8px; text-transform:uppercase; background:rgba(255,128,0,.14); border:.5px solid rgba(255,128,0,.35); border-radius:3px; padding:2px 6px; flex-shrink:0; margin-right:8px; z-index:3; }
-  .tb-news-inner { flex:1; overflow:hidden; min-width:0; }
-  .tb-news-track { display:flex; white-space:nowrap; animation:tbNewsScroll 80s linear infinite; }
-  .tb-news-track:hover { animation-play-state:paused; }
-  @keyframes tbNewsScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  .tb-news-item { display:inline-flex; align-items:center; gap:5px; padding:0 22px 0 0; font-size:11.5px; color:#C8D8F0; }
-  .tb-news-sep  { display:inline-block; color:rgba(255,255,255,.18); margin-right:22px; font-size:10px; }
-  .nb-cat { font-size:9px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; padding:1px 5px; border-radius:3px; flex-shrink:0; }
-  .nb-fin  { color:#60A5FA; background:rgba(96,165,250,.14); }
-  .nb-tech { color:#A78BFA; background:rgba(167,139,250,.14); }
-  .nb-mkt  { color:#34D399; background:rgba(52,211,153,.14); }
-  .nb-world{ color:#FBBF24; background:rgba(251,191,36,.14); }
-  .tb-stocks { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-  .tb-stock-chip { display:flex; align-items:center; gap:5px; background:rgba(45,91,227,.18); border:.5px solid rgba(45,91,227,.35); border-radius:4px; padding:3px 8px; cursor:pointer; transition:background .15s; }
-  .tb-stock-chip:hover { background:rgba(45,91,227,.30); }
-  .ch-tick { font-size:10px; font-weight:600; color:#A8C3FF; letter-spacing:.5px; }
-  .ch-px   { font-size:12px; font-weight:500; color:#E0E8FF; font-variant-numeric:tabular-nums; }
-  .ch-chg  { font-size:10px; font-weight:600; padding:1px 4px; border-radius:3px; }
-  .ch-up   { color:#4ADE80; background:rgba(74,222,128,.13); }
-  .ch-down { color:#F87171; background:rgba(248,113,113,.13); }
-  .tb-live { display:flex; align-items:center; gap:4px; font-size:9px; color:#7B9CC4; flex-shrink:0; }
-  .tb-live-dot { width:6px; height:6px; border-radius:50%; background:#4ADE80; animation:tbBlink 2s infinite; }
-  @keyframes tbBlink { 0%,100%{opacity:1} 50%{opacity:.25} }
-  /* Stock panel */
-  #vft-stock-panel { display:none; background:#0f1e30; border-bottom:1px solid rgba(255,255,255,.07); padding:12px 16px; gap:12px; flex-wrap:wrap; position:fixed; top:36px; z-index:999; }
-  #vft-stock-panel.open { display:flex; }
-  .vft-sc { flex:1; min-width:230px; background:rgba(255,255,255,.04); border:.5px solid rgba(255,255,255,.09); border-radius:8px; padding:10px 14px; }
-  .vft-sc.hl { border-color:#2D5BE3; }
-  .vft-sc-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
-  .vft-sc-name { font-size:12px; font-weight:600; color:#E0E8FF; }
-  .vft-sc-exch { font-size:9px; color:#7B9CC4; }
-  .vft-sc-price { font-size:20px; font-weight:700; color:#F0F4FF; font-variant-numeric:tabular-nums; margin-bottom:6px; }
-  .vft-sc-badge { font-size:11px; font-weight:600; padding:2px 7px; border-radius:4px; }
-  .vft-sc-badge.up   { color:#4ADE80; background:rgba(74,222,128,.13); }
-  .vft-sc-badge.down { color:#F87171; background:rgba(248,113,113,.13); }
-  .vft-sc-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px 10px; margin-top:7px; }
-  .vft-sc-kv { display:flex; flex-direction:column; gap:1px; }
-  .vft-sc-k  { font-size:8.5px; color:#7B9CC4; text-transform:uppercase; letter-spacing:.4px; }
-  .vft-sc-v  { font-size:11px; font-weight:500; color:#C8D8F0; font-variant-numeric:tabular-nums; }
-  .vft-sc-note  { font-size:9px; color:#4a6070; margin-top:7px; font-style:italic; line-height:1.5; }
-  .vft-sc-close { font-size:10px; color:#7B9CC4; cursor:pointer; text-decoration:underline; background:none; border:none; margin-top:5px; align-self:flex-start; }
-  /* Offset sticky nav for topbar */
-  nav { top:36px !important; }
   @media(max-width:768px){
-    body { padding-top:0; }
-    #vft-topbar { position:relative; padding:0; overflow:hidden; }
-    #vft-topbar-inner {
-      display:flex; align-items:center; padding:0 8px;
-      gap:0; min-width:max-content; will-change:transform;
-    }
-    .tb-div { margin:0 4px; }
     /* Nav 3-col su mobile */
     nav { grid-template-columns: auto auto auto; padding: 0 0.75rem; }
     .nav-logo img { height: 36px; }
-    /* Clocks su mobile: 2 colonne × 2 righe (Roma/Londra | NewYork/Riyadh) */
     .nav-clocks {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -289,142 +225,12 @@
     .nav-clocks .tb-clock .flag { font-size: 9px; }
     .nav-clocks .tb-clock .city { font-size: 5.5px; letter-spacing:.1px; }
     .nav-clocks .tb-clock .time { font-size: 8.5px; font-weight:700; }
+    /* Clocks su mobile: 2 colonne × 2 righe (Roma/Londra | NewYork/Riyadh) */
   }
 </style>
 </head>
 <body>
 
-<!-- ═══ TOPBAR: FUSI ORARI + NEWS + ORCL/SAP ═══ -->
-<div id="vft-topbar">
-  <div id="vft-topbar-inner">
-    <div class="tb-news-wrap">
-      <span class="tb-news-label">LIVE NEWS</span>
-      <div class="tb-news-inner"><div class="tb-news-track" id="vft-news-track"></div></div>
-    </div>
-    <div class="tb-div"></div>
-    <div class="tb-stocks" id="vft-stocks"></div>
-    <div class="tb-div"></div>
-    <div class="tb-live"><div class="tb-live-dot"></div>Live</div>
-  </div>
-</div>
-<div id="vft-stock-panel"></div>
-
-<script>
-/* ── TOPBAR ENGINE ── */
-(function(){
-  var ZONES=[
-    {city:'Roma',    tz:'Europe/Rome',      flag:'🇮🇹'},
-    {city:'Londra',  tz:'Europe/London',    flag:'🇬🇧'},
-    {city:'New York',tz:'America/New_York', flag:'🇺🇸'},
-    {city:'Riyadh',  tz:'Asia/Riyadh',      flag:'🇸🇦'}
-  ];
-  var STOCKS={
-    AAPL: {name:'Apple Inc.',                    ex:'NASDAQ',   price:213.32, change:+1.85,  pct:+0.87,  open:211.80,  high:214.20,  low:210.50,  vol:'52.1M',   mktcap:'$3.28T',  pe:'33.2',  wk52h:260.10,  wk52l:164.08,  note:'Chiusura NASDAQ 2 giu 2026.'},
-    META: {name:'Meta Platforms Inc.',           ex:'NASDAQ',   price:612.47, change:+8.33,  pct:+1.38,  open:605.00,  high:615.80,  low:603.20,  vol:'18.7M',   mktcap:'$1.55T',  pe:'28.4',  wk52h:740.91,  wk52l:414.50,  note:'Chiusura NASDAQ 2 giu 2026.'},
-    AMZN: {name:'Amazon.com Inc.',               ex:'NASDAQ',   price:223.15, change:+2.67,  pct:+1.21,  open:221.00,  high:224.50,  low:219.80,  vol:'31.4M',   mktcap:'$2.36T',  pe:'45.8',  wk52h:242.52,  wk52l:151.61,  note:'Chiusura NASDAQ 2 giu 2026.'},
-    NFLX: {name:'Netflix Inc.',                  ex:'NASDAQ',   price:1285.60,change:-9.40,  pct:-0.73,  open:1298.00, high:1301.20, low:1280.10, vol:'4.2M',    mktcap:'$552.3B', pe:'55.1',  wk52h:1358.38, wk52l:591.36,  note:'Chiusura NASDAQ 2 giu 2026.'},
-    GOOGL:{name:'Alphabet Inc. (Google)',         ex:'NASDAQ',   price:181.94, change:+1.24,  pct:+0.69,  open:180.80,  high:182.60,  low:179.50,  vol:'22.8M',   mktcap:'$2.24T',  pe:'24.7',  wk52h:207.05,  wk52l:140.53,  note:'Chiusura NASDAQ 2 giu 2026.'},
-    NVDA: {name:'NVIDIA Corporation',            ex:'NASDAQ',   price:135.58, change:+4.12,  pct:+3.13,  open:131.80,  high:136.20,  low:131.10,  vol:'312.5M',  mktcap:'$3.32T',  pe:'51.3',  wk52h:153.13,  wk52l:86.22,   note:'Chiusura NASDAQ 2 giu 2026.'},
-    MSFT: {name:'Microsoft Corporation',         ex:'NASDAQ',   price:458.20, change:+3.44,  pct:+0.76,  open:455.00,  high:459.80,  low:453.20,  vol:'19.3M',   mktcap:'$3.41T',  pe:'37.8',  wk52h:497.93,  wk52l:344.79,  note:'Chiusura NASDAQ 2 giu 2026.'},
-    ORCL: {name:'Oracle Corporation',            ex:'NYSE',     price:248.15, change:+22.37, pct:+9.91,  open:230.50,  high:250.25,  low:224.60,  vol:'48.39M',  mktcap:'$713.7B', pe:'44.55', wk52h:345.72,  wk52l:134.57,  note:'Chiusura NYSE 1 giu 2026.'},
-    SAP:  {name:'SAP SE ADR',                    ex:'NYSE',     price:181.79, change:-1.33,  pct:-0.73,  open:182.00,  high:182.82,  low:175.10,  vol:'~2.1M',   mktcap:'$211.0B', pe:'24.35', wk52h:313.28,  wk52l:158.58,  note:'Chiusura NYSE 1 giu 2026.'},
-    LDO:  {name:'Leonardo S.p.A.',               ex:'BIT',      price:32.18,  change:+0.84,  pct:+2.68,  open:31.40,   high:32.50,   low:31.20,   vol:'3.8M',    mktcap:'€18.9B',  pe:'18.2',  wk52h:35.92,   wk52l:19.44,   note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    PST:  {name:'Poste Italiane S.p.A.',         ex:'BIT',      price:14.22,  change:+0.18,  pct:+1.28,  open:14.05,   high:14.30,   low:13.98,   vol:'4.1M',    mktcap:'€18.2B',  pe:'12.4',  wk52h:16.48,   wk52l:11.82,   note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    LVMH: {name:'LVMH Moët Hennessy Louis Vuitton', ex:'EPA',price:548.80,change:-4.20, pct:-0.76,  open:553.20,  high:555.00,  low:546.50,  vol:'0.8M',    mktcap:'€138.2B',pe:'22.1',  wk52h:752.20,  wk52l:488.00,  note:'Chiusura Euronext Paris 2 giu 2026.'},
-    BX:   {name:'Blackstone Inc.',               ex:'NYSE',     price:168.45, change:+2.10,  pct:+1.26,  open:166.40,  high:169.20,  low:165.80,  vol:'5.2M',    mktcap:'$118.5B', pe:'38.6',  wk52h:198.78,  wk52l:118.44,  note:'Chiusura NYSE 2 giu 2026.'},
-    ISP:  {name:'Intesa Sanpaolo S.p.A.',        ex:'BIT',      price:4.218,  change:+0.048, pct:+1.15,  open:4.172,   high:4.240,   low:4.165,   vol:'68.4M',   mktcap:'€77.8B',  pe:'9.8',   wk52h:4.892,   wk52l:3.014,   note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    UCG:  {name:'UniCredit S.p.A.',              ex:'BIT',      price:47.82,  change:+0.62,  pct:+1.31,  open:47.22,   high:48.10,   low:47.05,   vol:'12.1M',   mktcap:'€58.3B',  pe:'8.2',   wk52h:54.28,   wk52l:30.14,   note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    G:    {name:'Assicurazioni Generali S.p.A.', ex:'BIT',      price:27.44,  change:+0.34,  pct:+1.25,  open:27.12,   high:27.60,   low:27.05,   vol:'5.8M',    mktcap:'€44.1B',  pe:'13.7',  wk52h:31.22,   wk52l:21.88,   note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    EL:   {name:'EssilorLuxottica S.A.',         ex:'EPA',      price:224.30, change:+1.80,  pct:+0.81,  open:222.60,  high:225.10,  low:221.80,  vol:'0.5M',    mktcap:'€96.4B',  pe:'31.8',  wk52h:248.55,  wk52l:178.20,  note:'Chiusura Euronext Paris 2 giu 2026.'},
-    TIMG: {name:'TIM Enterprise S.p.A.',         ex:'BIT',      price:0.312,  change:+0.004, pct:+1.30,  open:0.308,   high:0.315,   low:0.306,   vol:'142.5M',  mktcap:'€6.8B',   pe:'n/a',   wk52h:0.388,   wk52l:0.248,   note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    UHR:  {name:'The Swatch Group AG',           ex:'SIX',      price:148.25, change:-1.15,  pct:-0.77,  open:149.45,  high:149.80,  low:147.60,  vol:'0.2M',    mktcap:'CHF 19.8B',pe:'16.4', wk52h:198.40,  wk52l:130.20,  note:'Chiusura SIX 2 giu 2026.'},
-    RACE: {name:'Ferrari N.V.',                  ex:'NYSE',     price:488.20, change:+5.60,  pct:+1.16,  open:483.00,  high:490.10,  low:481.50,  vol:'0.7M',    mktcap:'$88.2B',  pe:'52.4',  wk52h:528.44,  wk52l:362.18,  note:'Chiusura NYSE 2 giu 2026.'},
-    VOW3: {name:'Volkswagen AG (Pref.)',          ex:'XETRA',    price:89.44,  change:-0.82,  pct:-0.91,  open:90.30,   high:90.58,   low:88.90,   vol:'3.2M',    mktcap:'€84.6B',  pe:'4.8',   wk52h:124.55,  wk52l:72.28,   note:'Chiusura XETRA 2 giu 2026.'},
-    KO:   {name:'The Coca-Cola Company',         ex:'NYSE',     price:73.18,  change:+0.42,  pct:+0.58,  open:72.80,   high:73.45,   low:72.55,   vol:'14.8M',   mktcap:'$315.4B', pe:'27.2',  wk52h:76.88,   wk52l:57.06,   note:'Chiusura NYSE 2 giu 2026.'},
-    NESN: {name:'Nestlé S.A.',              ex:'SIX',      price:74.42,  change:-0.28,  pct:-0.37,  open:74.72,   high:74.90,   low:74.10,   vol:'3.4M',    mktcap:'CHF 228.5B',pe:'18.9',wk52h:96.18,   wk52l:68.44,   note:'Chiusura SIX 2 giu 2026.'},
-    SKYB: {name:'Sky Group (Comcast/CMCSA)',     ex:'NASDAQ',   price:42.18,  change:+0.34,  pct:+0.81,  open:41.85,   high:42.40,   low:41.60,   vol:'22.1M',   mktcap:'$170.2B', pe:'15.8',  wk52h:50.12,   wk52l:36.44,   note:'Quotato come Comcast (CMCSA) NASDAQ.'},
-    MS:   {name:'Mediaset (MFE-A)',              ex:'BIT',      price:4.142,  change:+0.052, pct:+1.27,  open:4.092,   high:4.162,   low:4.080,   vol:'8.2M',    mktcap:'€4.9B',   pe:'14.2',  wk52h:5.018,   wk52l:3.144,   note:'Chiusura Borsa Italiana 2 giu 2026 (MFE).'},
-    SU:   {name:'Schneider Electric SE',         ex:'EPA',      price:248.60, change:+2.40,  pct:+0.98,  open:246.30,  high:249.50,  low:245.80,  vol:'1.1M',    mktcap:'€143.8B', pe:'30.4',  wk52h:278.45,  wk52l:188.22,  note:'Chiusura Euronext Paris 2 giu 2026.'},
-    TCA:  {name:'Thales S.A.',                   ex:'EPA',      price:192.45, change:+1.85,  pct:+0.97,  open:190.70,  high:193.20,  low:190.10,  vol:'0.4M',    mktcap:'€41.2B',  pe:'26.8',  wk52h:212.80,  wk52l:152.40,  note:'Chiusura Euronext Paris 2 giu 2026.'},
-    FCNT: {name:'Fincantieri S.p.A.',            ex:'BIT',      price:8.44,   change:+0.18,  pct:+2.18,  open:8.28,    high:8.52,    low:8.24,    vol:'2.1M',    mktcap:'€4.2B',   pe:'22.5',  wk52h:10.18,   wk52l:5.88,    note:'Chiusura Borsa Italiana 2 giu 2026.'},
-    SPACEX:{name:'SpaceX (Privata)',             ex:'Privata',  price:185.00, change:+5.00,  pct:+2.78,  open:180.00,  high:186.00,  low:179.00,  vol:'n/d',     mktcap:'~$350B',  pe:'n/a',   wk52h:200.00,  wk52l:110.00,  note:'Valore da transazioni secondarie. Non quotata.'},
-    A16Z:  {name:'Andreessen Horowitz (a16z)',   ex:'Privata',  price:0.00,   change:0.00,   pct:0.00,   open:0.00,    high:0.00,    low:0.00,    vol:'n/d',     mktcap:'~$35B',   pe:'n/a',   wk52h:0.00,    wk52l:0.00,    note:'Fondo VC privato. AUM ~$35B. Non quotato.'},
-    VG:    {name:'Vanguard Group (Privata)',      ex:'Privata',  price:0.00,   change:0.00,   pct:0.00,   open:0.00,    high:0.00,    low:0.00,    vol:'n/d',     mktcap:'n/d',     pe:'n/a',   wk52h:0.00,    wk52l:0.00,    note:'Di proprietà dei suoi fondi. AUM $10T+. Non quotata.'},
-    SPX:   {name:'S&P 500 Index',                ex:'Indice',   price:5868.40,change:+28.20, pct:+0.48,  open:5842.10, high:5875.20, low:5838.50, vol:'n/d',     mktcap:'n/d',     pe:'~24x',  wk52h:6147.43, wk52l:4801.45, note:'Indice 500 maggiori socié USA. 2 giu 2026.'},
-    IXIC:  {name:'NASDAQ Composite',             ex:'Indice',   price:19124.60,change:+112.40,pct:+0.59, open:19018.20,high:19148.80,low:18998.10,vol:'n/d',     mktcap:'n/d',     pe:'~32x',  wk52h:20204.58,wk52l:15708.53,note:'Indice azionario USA tecnologico. 2 giu 2026.'},
-    DJI:   {name:'Dow Jones Industrial Avg.',    ex:'Indice',   price:42580.20,change:+184.50,pct:+0.43, open:42402.10,high:42620.40,low:42350.80,vol:'n/d',     mktcap:'n/d',     pe:'~22x',  wk52h:45073.63,wk52l:36611.78,note:'Indice 30 maggiori società USA. 2 giu 2026.'},
-    BVMIB: {name:'FTSE MIB (Borsa Italiana)',    ex:'Indice',   price:38842.00,change:+318.00,pct:+0.83, open:38530.00,high:38920.00,low:38480.00,vol:'n/d',     mktcap:'n/d',     pe:'~12x',  wk52h:42184.00,wk52l:28800.00,note:'Indice 40 principali società a Milano. 2 giu 2026.'},
-    NYX:   {name:'NYSE Composite Index',         ex:'Indice',   price:19882.40,change:+88.20, pct:+0.45, open:19798.10,high:19904.60,low:19780.20,vol:'n/d',     mktcap:'n/d',     pe:'n/d',   wk52h:20882.14,wk52l:16018.44,note:'Indice composite NYSE. 2 giu 2026.'}
-  };
-  var FALLBACK=[
-    {t:'Oracle shares surge on AI cloud bookings record — NYSE:ORCL $248.15',cat:'Finance',cls:'nb-fin'},
-    {t:'SAP reports cloud revenue growth of 33% year-over-year — NYSE:SAP $181.79',cat:'Finance',cls:'nb-fin'},
-    {t:'Federal Reserve holds rates steady as inflation falls toward 2% target',cat:'Markets',cls:'nb-mkt'},
-    {t:'EU AI Act enforcement rules approved — tech companies face compliance deadlines',cat:'Tech',cls:'nb-tech'},
-    {t:'ECB signals cautious rate path amid mixed eurozone growth data',cat:'Finance',cls:'nb-fin'},
-    {t:'Microsoft Azure and Oracle OCI announce expanded interconnect for AI workloads',cat:'Tech',cls:'nb-tech'},
-    {t:'S&P 500 closes above 5,900 for third week on strong earnings momentum',cat:'Markets',cls:'nb-mkt'},
-    {t:'Italian government unveils €4bn digital transformation plan for public sector',cat:'World',cls:'nb-world'},
-    {t:'SAP RISE migration accelerates — 60% of Fortune 500 now on cloud ERP',cat:'Tech',cls:'nb-tech'},
-    {t:'Gold hits $2,480/oz as geopolitical risk premium rises across Asian markets',cat:'Markets',cls:'nb-mkt'},
-    {t:'OpenAI signs $4bn Oracle Cloud Infrastructure deal for GPT-5 training',cat:'Tech',cls:'nb-tech'},
-    {t:'Euro/Dollar holds near 1.09 ahead of ECB policy statement',cat:'Finance',cls:'nb-fin'},
-    {t:'G7 leaders agree on new framework for AI governance and digital trade',cat:'World',cls:'nb-world'},
-    {t:'China manufacturing PMI rises to highest level in 14 months',cat:'Markets',cls:'nb-mkt'},
-    {t:'UK economy grows 0.4% in Q1 2026, beating analyst expectations',cat:'World',cls:'nb-world'}
-  ];
-  var activeStock=null;
-  function fmt(tz){return new Date().toLocaleTimeString('it-IT',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
-  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-  // Build clocks + stocks after DOM is ready (nav comes AFTER this script tag)
-  document.addEventListener('DOMContentLoaded', function(){
-    // Render clocks into nav
-    var clEl = document.getElementById('vft-clocks');
-    if(clEl) clEl.innerHTML = ZONES.map(function(z){
-      return '<div class="tb-clock"><span class="flag">'+z.flag+'</span><div><span class="city">'+z.city+'</span><span class="time" id="vftc_'+z.tz.replace(/\//g,'_')+'">'+fmt(z.tz)+'</span></div></div>';
-    }).join('');
-
-    // Tick every second
-    setInterval(function(){
-      ZONES.forEach(function(z){
-        var el = document.getElementById('vftc_'+z.tz.replace(/\//g,'_'));
-        if(el) el.textContent = fmt(z.tz);
-      });
-    }, 1000);
-
-    // Render stock chips
-    var stEl = document.getElementById('vft-stocks');
-    if(stEl) stEl.innerHTML = Object.keys(STOCKS).map(function(sym){
-      var s=STOCKS[sym]; var up=s.pct>=0; var arr=up?'\u25b2':'\u25bc'; var sign=up?'+':'';
-      return '<div class="tb-stock-chip" onclick="vftTogglePanel(\''+sym+'\')" title="'+s.name+'">'
-        +'<span class="ch-tick">'+sym+'</span>'
-        +'<span class="ch-px">$'+s.price.toFixed(2)+'</span>'
-        +'<span class="ch-chg '+(up?'ch-up':'ch-down')+'">'+arr+sign+s.pct.toFixed(2)+'%</span></div>';
-    }).join('');
-  });
-
-  // ── Topbar scroll — desktop + mobile ──
-  document.addEventListener('DOMContentLoaded', function(){
-    var inner = document.getElementById('vft-topbar-inner');
-    if(!inner) return;
-    var pos = 0, last = null;
-    var speed = window.innerWidth > 768 ? 50 : 60;
-    function topbarStep(ts){
-      if(!last) last = ts;
-      var dt = Math.min(ts - last, 50); last = ts;
-      var w = inner.scrollWidth;
-      if(w > 0){
-        pos += speed * (dt / 1000);
-        if(pos >= w) pos = 0;
-        inner.style.transform = 'translateX(-' + pos.toFixed(1) + 'px)';
-      }
-      requestAnimationFrame(topbarStep);
-    }
-    requestAnimationFrame(topbarStep);
-  });
-
-})();
-</script>
 
 
 
@@ -651,6 +457,29 @@
   }
 
   window.addEventListener('load', function(){ setLang(getCurrentLang()); });
+
+  // ── Fusi orari ──
+  var ZONES=[
+    {city:'Roma',    tz:'Europe/Rome',      flag:'🇮🇹'},
+    {city:'Londra',  tz:'Europe/London',    flag:'🇬🇧'},
+    {city:'New York',tz:'America/New_York', flag:'🇺🇸'},
+    {city:'Riyadh',  tz:'Asia/Riyadh',      flag:'🇸🇦'}
+  ];
+  function fmtTz(tz){
+    return new Date().toLocaleTimeString('it-IT',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var clEl = document.getElementById('vft-clocks');
+    if(clEl) clEl.innerHTML = ZONES.map(function(z){
+      return '<div class="tb-clock"><span class="flag">'+z.flag+'</span><div><span class="city">'+z.city+'</span><span class="time" id="vftc_'+z.tz.replace(/\//g,'_')+'">'+fmtTz(z.tz)+'</span></div></div>';
+    }).join('');
+    setInterval(function(){
+      ZONES.forEach(function(z){
+        var el = document.getElementById('vftc_'+z.tz.replace(/\//g,'_'));
+        if(el) el.textContent = fmtTz(z.tz);
+      });
+    }, 1000);
+  });
 </script>
 </body>
 </html>
