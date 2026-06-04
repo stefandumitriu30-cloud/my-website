@@ -169,6 +169,11 @@
   .contact-text strong { color: var(--text-dark); display: block; font-size: 0.82rem; margin-bottom: 0.15rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .contact-text a { color: var(--blue); text-decoration: none; }
   .contact-text a:hover { text-decoration: underline; }
+  /* LinkedIn row */
+  .contact-row-pair { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+  .contact-row-pair .contact-row { margin-bottom: 0; flex: 1 1 auto; min-width: 0; }
+  .contact-icon-linkedin { background: #0077B5; }
+  .contact-icon-linkedin svg { stroke: #fff; }
   /* Contact section with founder photo */
   .contact-inner-wrap { display:flex; align-items:center; justify-content:space-between; gap:2rem; }
   .contact-photo-col { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
@@ -363,14 +368,24 @@
         <div class="contact-info">
           <h3><span class="en">Contact Details</span><span class="it">Dettagli di Contatto</span></h3>
 
-          <!-- Phone -->
-          <div class="contact-row">
-            <div class="contact-icon">
-              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.81a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16.92z"/></svg>
+          <!-- Phone + LinkedIn -->
+          <div class="contact-row-pair">
+            <!-- Phone -->
+            <div class="contact-row">
+              <div class="contact-icon">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.81a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.92 16.92z"/></svg>
+              </div>
+              <div class="contact-text">
+                <strong><span class="en">Phone</span><span class="it">Telefono</span></strong>
+                <a href="tel:+393279304297">+39 327 930 4297</a>
+              </div>
             </div>
-            <div class="contact-text">
-              <strong><span class="en">Phone</span><span class="it">Telefono</span></strong>
-              <a href="tel:+393279304297">+39 327 930 4297</a>
+            <!-- LinkedIn -->
+            <div class="contact-row" style="align-items:center;">
+              <a href="https://www.linkedin.com/company/vantage-finance-tech/?viewAsMember=true" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#0077B5;text-decoration:none;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                <span style="color:#fff;font-size:0.42rem;font-weight:700;line-height:1;margin-top:1px;letter-spacing:0.02em;"><span class="en">Follow Us</span><span class="it">Seguici</span></span>
+              </a>
             </div>
           </div>
 
