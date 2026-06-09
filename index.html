@@ -169,9 +169,10 @@
   .contact-text strong { color: var(--text-dark); display: block; font-size: 0.82rem; margin-bottom: 0.15rem; text-transform: uppercase; letter-spacing: 0.05em; }
   .contact-text a { color: var(--blue); text-decoration: none; }
   .contact-text a:hover { text-decoration: underline; }
-  /* LinkedIn row */
-  .contact-row-pair { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
+  /* Phone + LinkedIn row — same spacing as other rows */
+  .contact-row-pair { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: 1.25rem; }
   .contact-row-pair .contact-row { margin-bottom: 0; flex: 1 1 auto; min-width: 0; }
+  .contact-row-pair:last-child { margin-bottom: 0; }
   .contact-icon-linkedin { background: #0077B5; }
   .contact-icon-linkedin svg { stroke: #fff; }
   /* Contact section with founder photo */
@@ -199,6 +200,11 @@
     .hero { padding: 3.5rem 1.25rem 3rem; }
     .hero h1 { font-size: 1.6rem; }
     .contact-box { padding: 2rem 1.25rem; }
+    /* On mobile: phone row + LinkedIn side by side, LinkedIn pushed right */
+    .contact-info { align-self: stretch; width: 100%; padding-left: 1.5rem; }
+    .contact-row-pair { flex-direction: row; justify-content: space-between; align-items: center; gap: 0; margin-bottom: 1.25rem; }
+    .contact-row-pair .contact-row { margin-bottom: 0; flex: 0 0 auto; }
+    .contact-row-pair .contact-row:last-child { margin-bottom: 0; margin-left: auto; }
     .stat-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     .services-grid { grid-template-columns: 1fr; }
   }
