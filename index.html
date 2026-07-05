@@ -314,6 +314,21 @@
   }
   a.spec-pill.pmo-pill::after { content: ' ↗'; font-size: 0.7rem; opacity:0.85; }
 
+  /* SAP VIM pill — special */
+  a.spec-pill.vim-pill {
+    background: linear-gradient(135deg, #1E50DC 0%, #0E7C7B 100%);
+    border-color: #1E50DC;
+    box-shadow: 0 2px 12px rgba(30,80,220,0.30);
+    cursor: pointer;
+  }
+  a.spec-pill.vim-pill:hover {
+    background: linear-gradient(135deg, #15369B 0%, #0A5958 100%);
+    border-color: #15369B;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30,80,220,0.40);
+  }
+  a.spec-pill.vim-pill::after { content: ' ↗'; font-size: 0.7rem; opacity:0.85; }
+
   /* Modal overlay */
   .sap-modal-overlay {
     display: none; position: fixed; inset: 0; z-index: 1000;
@@ -485,6 +500,8 @@
       <a class="spec-pill controlling-pill" href="#" onclick="openControllingModal(event)">S4/HANA Controlling</a>
       <!-- Modern PMO pill — opens Modern PMO ERP Agentic AI Guide PDF -->
       <a class="spec-pill pmo-pill" href="#" onclick="openPmoModal(event)">Modern PMO</a>
+      <!-- SAP VIM pill — links to Architettura Funzionale SAP VIM presentation -->
+      <a class="spec-pill vim-pill" href="Architettura_Funzionale_SAP_VIM.pptx" target="_blank" rel="noopener">SAP VIM</a>
     </div>
   </div>
 </section>
